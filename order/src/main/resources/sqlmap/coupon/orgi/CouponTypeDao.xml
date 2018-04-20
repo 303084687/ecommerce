@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.coupon.orgi.CouponTypeMapper">
+  <!-- 管理后台列表数据返回map -->
+  <resultMap id="SelectListMap" type="com.weichuang.ecommerce.coupon.entity.response.CouponTypeSelectList" >
+	 <id column="id" property="id" jdbcType="INTEGER" />
+	 <result column="type_code" property="typeCode" jdbcType="VARCHAR"/>
+	 <result column="title" property="title" jdbcType="VARCHAR"/>
+	 <result column="category" property="category" jdbcType="INTEGER"/>
+	 <result column="discount_money" property="discountMoney" jdbcType="DECIMAL"/>
+	 <result column="time_type" property="timeType" jdbcType="INTEGER"/>
+	 <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+	 <result column="expire_time" property="expireTime" jdbcType="TIMESTAMP"/>
+	 <result column="day" property="day" jdbcType="INTEGER"/>
+  </resultMap>
+   
+  <!--增加优惠券类型 --> 
+  <insert id="addCouponType" parameterType="com.weichuang.ecommerce.coupon.entity.CouponType">
+  	INSERT INTO t_coupon_type(type_code,category,title,order_min,plat_limit,plat_limit_id,discount_money,receive_counts,receive_surplus,personal_counts,time_type,
+  	start_time,expire_time,day,create_time,creator,product_limit,product_id,status,description)VALUES(#{typeCode},#{category},#{title},#{orderMin},
+  	#{platLimit},#{platLimitId},#{discountMoney},#{receiveCounts},#{receiveSurplus},#{personalCounts},#{timeType},#{startTime},#{expireTime},#{day},now(),
+  	#{creator},#{productLimit},#{productId},1,#{description})
+  </insert>
+  
+  <!--修改优惠券类型 -->
+  <update id="updateCouponType" parameterType="com.weichuang.ecommerce.coupon.entity.CouponType">
+  	UPDATE t_coupon_type
+  	<set>
+  	 <if test="category !=null and category >0"> category =#{category},</if>
+  	 <if test="title !=null and title !='' "> title =#{title},</if>
+  	 <if test="orderMin !=null"> order_min =#{orderMin},</if>
+  	 <if test="platLimit !=null and platLimit >0 "> plat_limit =#{platLimit},</if>
+  	 <if test="discountMoney !=null"> discount_money =#{discountMoney},</if>
+  	 <if test="receiveCounts !=null and receiveCounts >0 "> receive_counts= #{receiveCounts},</if>
+  	 <if test="receiveSurplus !=null and receiveSurplus >0 "> receive_surplus= #{receiveSurplus},</if>
+  	 <if test="personalCounts!=null and personalCounts>0 "> personal_counts =#{personalCounts},</if>
+  	 <if test="timeType!=null and timeType>0 "> time_type =#{timeType},</if>
+  	 <if test="productLimit !=null and productLimit >0 "> product_limit =#{productLimit},</if>
+  	 <if test="description !=null and description !='' "> description =#{description},</if>
+  	 start_time =#{startTime},expire_time =#{expireTime},day =#{day},product_id =#{productId},plat_limit_id =#{platLimitId},
+  	</set>
+  	 WHERE id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <!--根据主键删除(物理删除) -->
+  <update id="deleteCouponType" parameterType="Map">
+  	<![CDATA[ UPDATE t_coupon_type SET status=#{status} where id=#{id}]]>
+  </update>
+  
+  <!--根据券号类型状态以及创建时间查询列表 -->
+  <select id="getCouponTypeList" parameterType="Map" resultType="com.weichuang.ecommerce.coupon.entity.CouponType">
+  	SELECT id,type_code as typeCode,category,title,order_min as orderMin,plat_limit as platLimit,plat_limit_id as platLimitId,discount_money as discountMoney,receive_counts as receiveCounts,
+  	receive_surplus  as receiveSurplus,time_type  as timeType,start_time  as startTime,expire_time  as expireTime,day,create_time  as createTime,status FROM t_coupon_type WHERE 1=1 
+  	  <if test="typeCode !=null and typeCode != ''"> AND type_code=#{typeCode}</if>
+	  <if test="status !=null and status>0"> AND status=#{status}</if>
+	  <if test="category !=null and category>0"> AND category=#{category}</if>
+	  <if test="startTime != null and startTime !='' "> AND create_time >= #{startTime}</if>
+      <if test="endTime != null  and endTime !='' "><![CDATA[ AND create_time <= #{endTime}]]></if>
+  	ORDER BY id desc
+  </select>
+  
+  <!--根据类型号查询详细信息(单个) -->
+  <select id="getCouponTypeById" parameterType="Map" resultType="com.weichuang.ecommerce.coupon.entity.CouponType">
+  	  SELECT id,type_code as typeCode,category,title,order_min as orderMin,plat_limit as platLimit,plat_limit_id as platLimitId,discount_money as discountMoney,receive_counts as receiveCounts,
+  	  receive_surplus as receiveSurplus,personal_counts as personalCounts,time_type as timeType,start_time as startTime,expire_time as expireTime,day,create_time as createTime,
+  	  creator,product_limit  as productLimit,product_id as productId,status,description FROM t_coupon_type WHERE 1=1 
+  	   <if test="typeCode !=null and typeCode != ''"> AND type_code=#{typeCode}</if>
+  	   <if test="id !=null and id>0"> AND id=#{id}</if>
+  </select>
+  
+  <!--根据多个券类型号查询信息返回集合 -->
+  <select id="getCouponTypeListByIds" parameterType="Map" resultType="com.weichuang.ecommerce.coupon.entity.CouponType">
+  	 SELECT id,type_code as typeCode,category,title,order_min  as orderMin,plat_limit  as platLimit,plat_limit_id as platLimitId,discount_money  as discountMoney,receive_counts  as receiveCounts,
+  	 receive_surplus as receiveSurplus,personal_counts  as personalCounts,time_type  as timeType,start_time  as startTime,expire_time  as expireTime,day,create_time as createTime,
+  	 creator,product_limit as productLimit,product_id  as productId,status,description FROM t_coupon_type WHERE status=1 AND type_code IN
+  	 <foreach item="item" index="index" collection="typeCode" open="(" separator="," close=")"> #{item} </foreach>
+  </select>
+  
+  <!--类型集合(用于下拉框)只查询正常状态下,用于生成优惠券 -->
+  <select id="getTypeList" resultMap="SelectListMap">
+  	<![CDATA[SELECT id,type_code,title,category,discount_money,time_type,start_time,expire_time,`day` FROM t_coupon_type WHERE status=1 ORDER BY id DESC]]>
+  </select>
+  
+  <!--当receiveCounts有领取总数量限制的时候,每领取一张批量更新剩余领取数量 -->
+  <update id="updateReceiveCount" parameterType="Map" >
+    UPDATE t_coupon_type SET receive_surplus=receive_surplus-#{number} WHERE type_code IN
+    <foreach item="item" index="index" collection="typeCodeList" open="(" separator="," close=")">
+        #{item}
+    </foreach>
+  </update>
+  
+  <!-- 根据限制使用渠道或者类型查询优惠券类型列表 -->
+  <select id="getLimitPlatId" parameterType="Map" resultType="com.weichuang.ecommerce.coupon.entity.CouponType">
+  	  SELECT id,type_code as typeCode,category,title,order_min as orderMin,plat_limit as platLimit,plat_limit_id as platLimitId,discount_money as discountMoney,
+  	  time_type as timeType,start_time as startTime,expire_time as expireTime,day,product_limit  as productLimit,status,description FROM t_coupon_type WHERE status=1
+  	   <if test="platLimitId !=null and platLimitId >0"> AND find_in_set(#{platLimitId},plat_limit_id)</if>
+  	   <if test="category !=null and category >0"> AND category=#{category}</if>
+  </select>
+  
+</mapper>

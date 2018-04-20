@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.order.orgi.OrderSentMapper">
+    <!-- 订单详情数据返回map -->
+    <resultMap type="com.weichuang.ecommerce.order.entity.OrderSentEntity" id="BaseResultMap">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="receiver_name" property="receiverName" jdbcType="VARCHAR"/>
+        <result column="province_id" property="provinceId" jdbcType="INTEGER"/>
+        <result column="city_id" property="cityId" jdbcType="INTEGER"/>
+        <result column="conuty_id" property="conutyId" jdbcType="INTEGER"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="mobile" property="mobile" jdbcType="VARCHAR"/>
+        <result column="postcode" property="postcode" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="send_time" property="sendTime" jdbcType="TIMESTAMP"/>
+        <result column="sending_time" property="sendingTime" jdbcType="TIMESTAMP"/>
+        <result column="tracking_num" property="trackingNum" jdbcType="VARCHAR"/>
+        <result column="receive_time" property="receiveTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		`id`,
+		`order_id`,
+		`order_no`,
+		`receiver_name`,
+		`province_id`,
+		`city_id`,
+		`conuty_id`,
+		`address`,
+		`mobile`,
+		`postcode`,
+		`create_time`,
+		`send_time`,
+		`sending_time`,
+		`tracking_num`,
+		`receive_time`,
+		`status`
+	</sql>
+
+    <!-- 增加订单收货人信息-->
+    <insert id="addOrderSent" parameterType="com.weichuang.ecommerce.order.entity.OrderSentEntity"
+            useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `ecommerce`.`t_order_sent`
+		(`order_id`,
+		`order_no`,
+		`receiver_name`,
+		`province_id`,
+		`city_id`,
+		`conuty_id`,
+		`address`,
+		`mobile`,
+		`postcode`,
+		`create_time`,
+		`send_time`,
+		`tracking_num`,
+		`receive_time`,
+		`status`
+		)
+		VALUES
+		(#{orderId,jdbcType=INTEGER},
+		#{orderNo,jdbcType=VARCHAR},
+		#{receiverName,jdbcType=VARCHAR},
+		#{provinceId,jdbcType=INTEGER},
+		#{cityId,jdbcType=INTEGER},
+		#{conutyId,jdbcType=INTEGER},
+		#{address,jdbcType=VARCHAR},
+		#{mobile,jdbcType=VARCHAR},
+		#{postcode,jdbcType=VARCHAR},
+		NOW(),
+		#{sendTime,jdbcType=TIMESTAMP},
+		#{trackingNum,jdbcType=VARCHAR},
+		#{receiveTime,jdbcType=TIMESTAMP},
+		#{status,jdbcType=INTEGER}
+		)
+	</insert>
+    <select id="getOrderSentByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `ecommerce`.`t_order_sent`
+        WHERE order_id = #{orderId, jdbcType=INTEGER} ORDER BY id DESC
+    </select>
+
+    <select id="getOrderSentByOrderNo" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `ecommerce`.`t_order_sent`
+        WHERE order_no = #{orderNo, jdbcType=VARCHAR} ORDER BY id DESC
+    </select>
+
+    <select id="getOrderSentByOrderNoOrderByIdASC" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `ecommerce`.`t_order_sent`
+        WHERE order_no = #{orderNo, jdbcType=VARCHAR} ORDER BY id ASC
+    </select>
+
+	<select id="getOrderSentByIdAndOrderNo" resultMap="BaseResultMap" parameterType="Map">
+		SELECT
+		<include refid="Base_Column_List"/>
+		FROM `ecommerce`.`t_order_sent`
+		WHERE order_no = #{orderNo, jdbcType=VARCHAR} AND id=#{id, jdbcType=INTEGER}
+	</select>
+
+    <!--查询过期未收货订单-->
+    <select id="getOrderSentExpire" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `ecommerce`.`t_order_sent`
+        WHERE status = 2 AND TO_DAYS(NOW()) - TO_DAYS(sending_time) > 7
+        <if test="orderNo != null and orderNo != ''">AND `order_no` = #{orderNo,jdbcType=VARCHAR}</if>
+        ORDER BY id DESC
+    </select>
+
+    <!--根据订单编号和发货记录id，更新记录的为待收货的状态（发货的信息，快递单号等）-->
+    <update id="updateOrderSentStatusToShippingByIdAndOrderNo" parameterType="Map">
+        UPDATE `t_order_sent`
+        SET
+        `status` = 2,
+        <if test="sendingTime != null">`sending_time`=#{sendingTime,jdbcType=TIMESTAMP},</if>
+        `tracking_num` = #{trackingNum, jdbcType=VARCHAR},
+        `operator` = #{operator, jdbcType=VARCHAR},
+        `operator_name` = #{operatorName,jdbcType=VARCHAR},
+        `operate_time` = NOW()
+        WHERE id=#{id, jdbcType=INTEGER} AND `order_no` = #{orderNo, jdbcType=VARCHAR}
+    </update>
+    <!--根据发货id，订单编号更新发货状态,更新为已收货（发货的信息，快递单号等）-->
+    <update id="updateOrderSentStatusToReceivedByIdAndOrderNo" parameterType="Map">
+		UPDATE `t_order_sent`
+		SET
+		`status` = 3,
+		`receive_time`= NOW()
+		WHERE id=#{id, jdbcType=INTEGER} AND `order_no` = #{orderNo, jdbcType=VARCHAR}
+	</update>
+    <!--根据订单编号和发货记录id，更新未发货记录的发货时间-->
+    <update id="updateOrderSendTimeByIdAndOrderNo" parameterType="Map">
+		UPDATE `t_order_sent`
+		SET
+		`send_time`=#{sendTime,jdbcType=TIMESTAMP},
+		`operator` = #{operator, jdbcType=VARCHAR},
+		`operator_name` = #{operatorName,jdbcType=VARCHAR},
+		`operate_time` = NOW()
+		WHERE id = #{id, jdbcType=INTEGER} AND `order_no` = #{orderNo, jdbcType=VARCHAR} AND `status`=1
+	</update>
+    <!--根据订单编号和发货记录id，更新未发货记录的收货地址-->
+    <update id="updateOrderSendAddressByIdAndOrderNo" parameterType="Map">
+		UPDATE `t_order_sent`
+		SET
+		`receiver_name` = #{receiverName, jdbcType=VARCHAR} ,
+		`province_id` = #{provinceId, jdbcType=INTEGER} ,
+		`city_id` = #{cityId, jdbcType=INTEGER} ,
+		`conuty_id` = #{countyId, jdbcType=INTEGER} ,
+		`address` = #{address, jdbcType=VARCHAR} ,
+		`mobile` = #{mobile, jdbcType=VARCHAR} ,
+		`operator` = #{operator, jdbcType=VARCHAR} ,
+		`operator_name` = #{operatorName,jdbcType=VARCHAR} ,
+		`operate_time` = NOW()
+		WHERE id = #{id, jdbcType=INTEGER} AND `order_no` = #{orderNo, jdbcType=VARCHAR} AND `status`=1
+	</update>
+    <!--查询订单发货详情-->
+    <select id="getOrderSentByNo" resultMap="BaseResultMap" parameterType="Map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        `ecommerce`.`t_order_sent`
+        WHERE status = #{status, jdbcType=VARCHAR} AND `order_no` = #{orderNo,jdbcType=VARCHAR} ORDER BY id ASC LIMIT 1
+    </select>
+
+</mapper>

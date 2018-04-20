@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.weichuang.ecommerce.barcode.SalesShareEnvelopeMapper" >
+  <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.barcode.entity.SalesShareEnvelope" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="setid" property="setid" jdbcType="INTEGER" />
+    <result column="userid" property="userid" jdbcType="INTEGER" />
+    <result column="openid" property="openid" jdbcType="VARCHAR" />
+    <result column="codekey" property="codekey" jdbcType="VARCHAR" />
+    <result column="share_income" property="shareIncome" jdbcType="DECIMAL" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="income_date" property="incomeDate" jdbcType="DATE" />
+    <result column="income_time" property="incomeTime" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="incomeDetailResultMap" type="com.weichuang.ecommerce.barcode.entity.SalesIncomeDetailEntity">
+    <result column="come_date" property="comDate" jdbcType="VARCHAR" />
+    <result column="income_date" property="incomeDate" jdbcType="DATE" />
+    <result column="income_time" property="incomeTime" jdbcType="VARCHAR" />
+    <result column="come_type" property="comeType" jdbcType="INTEGER" />
+    <result column="come_type_msg" property="comeTypeMsg" jdbcType="VARCHAR" />
+    <result column="income" property="income" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, setid, userid, openid, codekey, share_income, state, income_date, income_time,
+    create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from t_sale_share_envelop
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectCountByUserId" resultType="int" parameterType="int">
+    select count(*) from t_sale_share_envelop where userid=#{userid} and DATE_FORMAT(create_time,'%Y-%m-%d')=DATE_FORMAT(now(),'%Y-%m-%d')
+  </select>
+  <select id="selectCountByUserIdCodekey" parameterType="map" resultType="int">
+    select count(*) from t_sale_share_envelop where userid=#{userid} and codekey=#{codekey} and DATE_FORMAT(create_time,'%Y-%m-%d')=DATE_FORMAT(now(),'%Y-%m-%d')
+  </select>
+  <!--分享红包总额-->
+  <select id="selectAllIncome" parameterType="int" resultType="java.math.BigDecimal">
+select ifnull(sum(share_income),0)  from t_sale_share_envelop where state=0 and userid=#{userid}
+  </select>
+  <!--分享红包明细集合-->
+  <select id="selectAllIncomList" parameterType="int" resultMap="BaseResultMap">
+    select   <include refid="Base_Column_List" />  from t_sale_share_envelop where state=0 and userid=#{userid}
+  </select>
+  <!--分享提现红包明细-->
+  <select id="selectIncomeDetail" parameterType="int" resultMap="incomeDetailResultMap">
+    select * from
+    (
+    (select
+    user_id as userid,
+    case (TO_DAYS( NOW( ) ) - TO_DAYS( income_date))
+    when 0 THEN
+    '今天'
+    when 1 then
+    '昨天'
+    ELSE
+    income_date
+    end as come_date ,
+    income_date,
+    income_time,
+    '余额提现' as come_type_msg,
+    1 as come_type,
+    income
+    FROM t_sales_share_envelop_withdraw
+    )
+    union
+    (
+    select
+    userid,
+    case (TO_DAYS( NOW( ) ) - TO_DAYS( income_date))
+    when 0 THEN
+    '今天'
+    when 1 then
+    '昨天'
+    ELSE
+    income_date
+    end as come_date ,
+    income_date,
+    income_time,
+    '获得红包' as come_type_msg,
+    2 as come_type,
+    share_income as income
+    from
+    t_sale_share_envelop
+
+    )
+    ) redenvelop
+    where    redenvelop.userid=#{userId} and DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= date(income_date)
+    order by redenvelop.income_date desc,income_time desc
+
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_sale_share_envelop
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.weichuang.ecommerce.barcode.entity.SalesShareEnvelope" >
+    insert into t_sale_share_envelop (id, setid, userid,
+    openid, codekey, share_income,
+    state, income_date, income_time,
+    create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{setid,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER},
+    #{openid,jdbcType=VARCHAR}, #{codekey,jdbcType=VARCHAR}, #{shareIncome,jdbcType=DECIMAL},
+    #{state,jdbcType=INTEGER}, #{incomeDate,jdbcType=DATE}, #{incomeTime,jdbcType=VARCHAR},
+    #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.weichuang.ecommerce.barcode.entity.SalesShareEnvelope" >
+    insert into t_sale_share_envelop
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="setid != null" >
+        setid,
+      </if>
+      <if test="userid != null" >
+        userid,
+      </if>
+      <if test="openid != null" >
+        openid,
+      </if>
+      <if test="codekey != null" >
+        codekey,
+      </if>
+      <if test="shareIncome != null" >
+        share_income,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+
+        income_date,
+
+        income_time,
+
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="setid != null" >
+        #{setid,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="openid != null" >
+        #{openid,jdbcType=VARCHAR},
+      </if>
+      <if test="codekey != null" >
+        #{codekey,jdbcType=VARCHAR},
+      </if>
+      <if test="shareIncome != null" >
+        #{shareIncome,jdbcType=DECIMAL},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+      date_format(now(),'%Y-%m-%d'),
+      date_format(now(),'%T'),
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateAllIncomeState">
+    update
+    t_sale_share_envelop
+    set
+    state=1
+    where id in
+    <foreach collection="list" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.weichuang.ecommerce.barcode.entity.SalesShareEnvelope" >
+    update t_sale_share_envelop
+    <set >
+      <if test="setid != null" >
+        setid = #{setid,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null" >
+        userid = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="openid != null" >
+        openid = #{openid,jdbcType=VARCHAR},
+      </if>
+      <if test="codekey != null" >
+        codekey = #{codekey,jdbcType=VARCHAR},
+      </if>
+      <if test="shareIncome != null" >
+        share_income = #{shareIncome,jdbcType=DECIMAL},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="incomeDate != null" >
+        income_date = #{incomeDate,jdbcType=DATE},
+      </if>
+      <if test="incomeTime != null" >
+        income_time = #{incomeTime,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.weichuang.ecommerce.barcode.entity.SalesShareEnvelope" >
+    update t_sale_share_envelop
+    set setid = #{setid,jdbcType=INTEGER},
+    userid = #{userid,jdbcType=INTEGER},
+    openid = #{openid,jdbcType=VARCHAR},
+    codekey = #{codekey,jdbcType=VARCHAR},
+    share_income = #{shareIncome,jdbcType=DECIMAL},
+    state = #{state,jdbcType=INTEGER},
+    income_date = #{incomeDate,jdbcType=DATE},
+    income_time = #{incomeTime,jdbcType=VARCHAR},
+    create_time = #{createTime,jdbcType=TIMESTAMP},
+    update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

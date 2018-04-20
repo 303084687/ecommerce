@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.weichuang.ecommerce.barcode.SalesRedEnvelopeReceMapper" >
+  <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.barcode.entity.SalesRedEnvelopeRece" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="rid" property="rid" jdbcType="INTEGER" />
+    <result column="sales_id" property="salesId" jdbcType="INTEGER" />
+    <result column="ctime" property="ctime" jdbcType="TIMESTAMP" />
+    <result column="rtime" property="rtime" jdbcType="TIMESTAMP" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, rid, sales_id, ctime, rtime, state
+  </sql>
+  <select id="selectBySalesAndAid" parameterType="map" resultMap="BaseResultMap">
+    select
+    r.*
+    from t_sale_red_envelope_rece r left join t_sales_pull_new_set s on r.rid=s.id
+    where r.sales_id=#{salesId} and s.aid=#{aid}
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_sale_red_envelope_rece
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_sale_red_envelope_rece
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.weichuang.ecommerce.barcode.entity.SalesRedEnvelopeRece" >
+    insert into t_sale_red_envelope_rece (id, rid, sales_id, 
+      ctime, rtime, state
+      )
+    values (#{id,jdbcType=INTEGER}, #{rid,jdbcType=INTEGER}, #{salesId,jdbcType=INTEGER}, 
+      #{ctime,jdbcType=TIMESTAMP}, #{rtime,jdbcType=TIMESTAMP}, #{state,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.weichuang.ecommerce.barcode.entity.SalesRedEnvelopeRece" >
+    insert into t_sale_red_envelope_rece
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="rid != null" >
+        rid,
+      </if>
+      <if test="salesId != null" >
+        sales_id,
+      </if>
+        ctime,
+      <if test="rtime != null" >
+        rtime,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="rid != null" >
+        #{rid,jdbcType=INTEGER},
+      </if>
+      <if test="salesId != null" >
+        #{salesId,jdbcType=INTEGER},
+      </if>
+        now(),
+      <if test="rtime != null" >
+        #{rtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.weichuang.ecommerce.barcode.entity.SalesRedEnvelopeRece" >
+    update t_sale_red_envelope_rece
+    <set >
+      <if test="rid != null" >
+        rid = #{rid,jdbcType=INTEGER},
+      </if>
+      <if test="salesId != null" >
+        sales_id = #{salesId,jdbcType=INTEGER},
+      </if>
+      <if test="ctime != null" >
+        ctime = #{ctime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="rtime != null" >
+        rtime = #{rtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.weichuang.ecommerce.barcode.entity.SalesRedEnvelopeRece" >
+    update t_sale_red_envelope_rece
+    set rid = #{rid,jdbcType=INTEGER},
+      sales_id = #{salesId,jdbcType=INTEGER},
+      ctime = #{ctime,jdbcType=TIMESTAMP},
+      rtime = #{rtime,jdbcType=TIMESTAMP},
+      state = #{state,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateReceState" parameterType="com.weichuang.ecommerce.barcode.entity.SalesRedEnvelopeRece">
+    update
+    t_sale_red_envelope_rece
+    set
+    state=#{state}
+    <if test="state==1">
+      ,rtime=now()
+    </if>
+    where
+    sales_id=#{salesId} and  rid=#{rid}
+  </update>
+  <select id="selectCountBySalesAndSet" parameterType="com.weichuang.ecommerce.barcode.entity.SalesRedEnvelopeRece" resultType="int">
+    select count(*) from t_sale_red_envelope_rece where sales_id=#{salesId} and rid=#{rid}
+  </select>
+  <select id="selectBySalesAndSet" parameterType="com.weichuang.ecommerce.barcode.entity.SalesRedEnvelopeRece" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_sale_red_envelope_rece where sales_id=#{salesId} and rid=#{rid}
+  </select>
+</mapper>

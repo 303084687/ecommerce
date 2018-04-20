@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.website.orgi.BannerMapper">
+  <!-- 数据返回map -->
+  <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.website.entity.WebsiteBannerEntity" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="browse_number" property="browseNumber" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="image_url" property="imageUrl" jdbcType="VARCHAR" />
+    <result column="browse_number" property="browseNumber" jdbcType="INTEGER" />
+    <result column="link_url" property="linkUrl" jdbcType="VARCHAR" />
+    <result column="keywords" property="keywords" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="channel_ids" property="channelIds" jdbcType="VARCHAR" />
+    <result column="push_time" property="pushTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <!-- 管理列表显示 -->
+	  <select id="bannerList" resultMap="BaseResultMap" parameterType="Map">
+		   SELECT id,title,keywords,image_url,type,`status`,browse_number,create_time,push_time,channel_ids FROM t_website_banner WHERE 1=1
+		    <if test="classify==1">AND type =1 OR type=5</if>
+		    <if test="classify==2">AND type != 1 AND type !=5
+		     <if test="type !=null and type>0"> AND type=#{type}</if>
+		    </if>
+		    <if test="title !=null and title != ''"> AND INSTR(title,#{title})</if>
+		    <if test="status !=null and status>0"> AND status=#{status}</if>
+		    <if test="startTime != null and startTime !='' "> AND create_time >= #{startTime}</if>
+	        <if test="endTime != null  and endTime !='' "><![CDATA[ AND create_time <= #{endTime}]]></if>
+		    order by sort desc,id desc
+	  </select>
+  
+  <!-- 渠道显示列表,并把结果按照sort倒叙排列 查询正常状态的并且发布时间小于当前时间-->
+	 <select id="channelList" parameterType="Map" resultMap="BaseResultMap">
+	     SELECT id,title,image_url,type,`status`,create_time,browse_number,link_url,push_time FROM t_website_banner WHERE  `status`=1 
+	     AND type IN
+	     <foreach item="item" index="index" collection="types" open="(" separator="," close=")">
+              #{item}
+        </foreach>
+	     <![CDATA[ AND push_time <= #{systemTime}]]>
+	     <if test="channel !=null and  channel >0"> AND find_in_set(#{channel},channel_ids)</if>
+	     ORDER BY sort DESC ,id DESC
+	 </select>
+  
+  <!-- 根据主键查询详情 -->
+	  <select id="selectById" resultMap="BaseResultMap" parameterType="Map" >
+		  SELECT id,title,keywords,image_url,type,`status`,browse_number,link_url,create_time,push_time,update_time,channel_ids,content FROM t_website_banner WHERE id = #{id,jdbcType=INTEGER}
+	  </select>
+  
+  <!-- 增加轮播图-->
+	  <insert id="insert" parameterType="com.weichuang.ecommerce.website.entity.WebsiteBannerEntity" >
+	      INSERT INTO t_website_banner (title,keywords,image_url,browse_number,link_url,type, channel_ids, content, status, sort,push_time, create_time)
+	      VALUES (#{title,jdbcType=VARCHAR},#{keywords,jdbcType=VARCHAR},#{imageUrl,jdbcType=VARCHAR},1,#{linkUrl,jdbcType=VARCHAR},
+	      #{type,jdbcType=INTEGER},#{channelIds,jdbcType=VARCHAR},#{content,jdbcType=VARCHAR},
+	      #{status,jdbcType=INTEGER},1,#{pushTime,jdbcType=TIMESTAMP},now())
+	  </insert>
+  
+  <!-- 根据主键修改轮播图 -->
+	  <update id="update" parameterType="com.weichuang.ecommerce.website.entity.WebsiteBannerEntity" >
+		    UPDATE t_website_banner
+		    <set>
+		      <if test="type != null and type >0" >type = #{type,jdbcType=INTEGER},</if>
+		      <if test="status != null and status >0" >status  = #{status,jdbcType=INTEGER},</if>
+		      <if test="browseNumber != null and browseNumber >0" >browse_number = #{browseNumber,jdbcType=INTEGER},</if>
+		      <if test="title != null and title !='' " >title = #{title,jdbcType=VARCHAR},</if>
+		      <if test="imageUrl != null and imageUrl !='' " >image_url = #{imageUrl,jdbcType=VARCHAR},</if>
+		      <if test="linkUrl != null and linkUrl !='' " >link_url = #{linkUrl,jdbcType=VARCHAR},</if>
+		      <if test="keywords != null and keywords !='' " > keywords = #{keywords,jdbcType=VARCHAR},</if>
+		      <if test="content != null and content !='' ">content = #{content,jdbcType=VARCHAR},</if>
+		      <if test="channelIds != null and channelIds !='' " > channel_ids = #{channelIds,jdbcType=VARCHAR},</if>
+		       update_time =now(),
+		      <if test="pushTime != null">push_time = #{pushTime,jdbcType=TIMESTAMP},</if>
+		    </set>
+		     WHERE id = #{id,jdbcType=INTEGER}
+	  </update>
+  
+  <!-- 置顶功能 -->
+	  <update id="updateHotById" parameterType="Map">
+		   UPDATE t_website_banner SET sort=#{maxSort}+1 WHERE id = #{id,jdbcType=INTEGER} AND type=#{type}
+      </update>
+      
+  <!-- 查询出最大排序数 -->
+	  <select id="maxSort" parameterType="Map"  resultType="int">
+		   <![CDATA[ SELECT max(sort) as sort FROM t_website_banner WHERE 1=1]]>
+		   <if test="type != null and type > 0">  and type =#{type}</if>
+	  </select>
+  <!-- 更新浏览数量 -->
+      <update id="updateBrowseNumber" parameterType="Map">
+       UPDATE t_website_banner SET browse_number=browse_number+1 WHERE id = #{id,jdbcType=INTEGER}
+      </update>
+</mapper>

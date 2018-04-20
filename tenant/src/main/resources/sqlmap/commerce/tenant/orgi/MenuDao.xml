@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.tenant.orgi.MenuMapper">
+  <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.tenant.entity.MenuEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="parent_name" jdbcType="VARCHAR" property="parentName" />
+    <result column="res_key" jdbcType="VARCHAR" property="resKey" />
+    <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+    <result column="res_url" jdbcType="VARCHAR" property="resUrl" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <resultMap id="AdminMenuMap" type="com.weichuang.ecommerce.tenant.entity.AdminMenuTemplate">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
+    <result column="res_key" jdbcType="VARCHAR" property="resKey" />
+    <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+    <result column="parent_name" jdbcType="VARCHAR" property="parentName" />
+    <result column="res_url" jdbcType="VARCHAR" property="resUrl" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="selected" jdbcType="INTEGER" property="selected" />
+  </resultMap>
+  <!--增加菜单  -->
+  <insert id="addMenu" parameterType="com.weichuang.ecommerce.tenant.entity.MenuEntity">
+    insert into t_menu(name,parent_id,res_key,type,res_url,status,description,icon,create_time)values(#{name,jdbcType=VARCHAR},#{parentId,jdbcType=INTEGER},
+   #{resKey,jdbcType=VARCHAR},#{type,jdbcType=INTEGER},#{resUrl,jdbcType=VARCHAR},1,#{description,jdbcType=VARCHAR},#{icon,jdbcType=VARCHAR},
+   #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <!--修改菜单  -->
+  <update id="updateMenu" parameterType="com.weichuang.ecommerce.tenant.entity.MenuEntity">
+    update t_menu
+	    <set>
+	      <if test="resUrl !=null and resUrl !='' "> res_url=#{resUrl,jdbcType=VARCHAR},</if>
+	      <if test="icon !=null and icon !='' "> icon=#{icon,jdbcType=VARCHAR},</if>
+	      <if test="name !=null and name !='' "> name=#{name,jdbcType=VARCHAR},</if>
+	      <if test="description !=null  and description !='' "> description=#{description,jdbcType=VARCHAR},</if>
+	      <if test="status != null and status >0 "> status =#{status,jdbcType=INTEGER},</if>
+	       <if test="type != null and type >0 "> type =#{type,jdbcType=INTEGER},</if>
+	      <if test="parentId != null and parentId >0 "> parent_id =#{parentId,jdbcType=INTEGER},</if>
+	    </set>
+	 where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!--菜单列表  -->
+  <select id="getMenuList" resultMap="BaseResultMap" parameterType="Map">
+     SELECT t1.id,t1.parent_id,t1.`name`,t2.`name` AS parent_name,t1.res_key,t1.type,t1.res_url,t1.`status`,t1.description,t1.create_time
+     FROM t_menu t1 LEFT JOIN t_menu t2 ON t1.parent_id = t2.id where 1=1
+      <if test="type !=null and type >0"> and t1.type =#{type}</if>
+    order by id asc, parent_id desc
+  </select>
+  <!-- 根据菜单主键查询详细信息 -->
+  <select id="getMenuById" resultMap="BaseResultMap" parameterType="Map">
+    select id,name,parent_id,res_key,type,res_url,status,description,icon,create_time from t_menu where 1=1
+    <if test="menuId !=null"> and id=#{menuId}</if>
+    <if test="menuName !=null  and menuName != '' "> and name=#{menuName}</if>
+  </select>
+  <!--菜单角色增加  -->
+  <insert id="addMenuRole" parameterType="Map">
+     insert into r_role_menu(meun_id,role_id) values
+    <foreach collection="list"  item="item"  index="index" open="" close="" separator="," >  
+        (#{item.meunId},#{item.roleId})  
+    </foreach>  
+  </insert>
+  <!--菜单角色修改  -->
+  <update id="updateMenuRole" parameterType="Map">
+      <foreach collection="list" item="item" index="index" open="" close="" separator=";">  
+         update r_role_menu   
+           <set>  
+             meun_id=${item.meunId}
+           </set>  
+          where role_id = ${item.roleId}
+      </foreach>  
+  </update>
+  <!--菜单角色删除(删除角色时候要对应删除角色对用菜单) -->
+  <delete id="deleteMenuRole" parameterType="Map">
+     delete from r_role_menu where role_id=#{roleId}
+  </delete>
+  <!--根据角色主键查询所有菜单(关联菜单和菜单-角色表查询)
+  <select id="getUserMenu"  resultMap="AdminMenuMap" parameterType="Map"> 
+      SELECT id,name,parent_id,(select r.name from t_menu r where r.id = menu.parent_id ) parent_name,
+	  res_key,type,res_url,status,description FROM t_menu as menu WHERE id in(SELECT meun_id FROM r_role_menu WHERE role_id in(
+      SELECT ar.role_id FROM r_admin_role ar,t_admin a,t_role as role WHERE ar.admin_id=a.id and ar.role_id=#{roleId} and role.status=1))
+     and menu.`status`=1
+  </select> -->
+  <!--根据角色主键查询所有菜单(关联菜单和菜单-角色表查询) -->
+  <select id="getUserMenu"  resultMap="AdminMenuMap" parameterType="Map"> 
+      SELECT t1.id,t1.parent_id,t1.`name`,t2.`name` AS parent_name,t1.res_key,t1.type,t1.res_url,t1.`status`,t1.description,t1.icon,
+	  CASE WHEN t3.meun_id IS NULL THEN FALSE ELSE TRUE END AS selected  FROM t_menu t1 LEFT JOIN t_menu t2 ON t1.parent_id = t2.id
+      LEFT JOIN r_role_menu t3 ON t1.id = t3.meun_id AND t3.role_id= #{roleId} WHERE 1=1 
+      <if test="status !=null and status >0"> and t1.`status` = #{status}</if>
+  </select>
+</mapper>

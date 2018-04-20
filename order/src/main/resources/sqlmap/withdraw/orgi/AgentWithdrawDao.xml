@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.withdraw.orgi.AgentWithdrawMapper">
+
+	<!-- 提现详情数据返回map -->
+	<resultMap type="com.weichuang.ecommerce.withdraw.entity.AgentWithdrawInfoEntity" id="InfoResultMap">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="agent_id" property="agentId" jdbcType="INTEGER"/>
+		<result column="withdraw" property="withdraw" jdbcType="DECIMAL"/>
+		<result column="status" property="status" jdbcType="VARCHAR"/>
+		<result column="nick_name" property="nickName" jdbcType="VARCHAR"/>
+		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+
+	</resultMap>
+
+	<!-- 提现数据返回map -->
+	<resultMap type="com.weichuang.ecommerce.withdraw.entity.AgentWithdrawEntity" id="ResultMap">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="agent_id" property="agentId" jdbcType="INTEGER"/>
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR"/>
+		<result column="open_id" property="openId" jdbcType="VARCHAR"/>
+		<result column="withdraw" property="withdraw" jdbcType="DECIMAL"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="payment_no" property="paymentNo" jdbcType="VARCHAR"/>
+		<result column="payment_type" property="paymentType" jdbcType="INTEGER"/>
+		<result column="payment_sequence" property="paymentSequence" jdbcType="VARCHAR"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+
+	</resultMap>
+
+
+	 <!-- 增加待提现记录 -->
+	 <insert id="addSaleCash" parameterType="com.weichuang.ecommerce.withdraw.entity.AgentWithdrawEntity" useGeneratedKeys="true" keyProperty="id">
+		  insert into t_agent_withdraw(agent_id,agent_name,withdraw,payment_type,payment_no,open_id,status,create_time)
+		  values(#{agentId,jdbcType=INTEGER},#{agentName,jdbcType=VARCHAR},#{withdraw,jdbcType=DECIMAL},
+		  #{paymentType,jdbcType=INTEGER},#{paymentNo,jdbcType=VARCHAR},#{openId,jdbcType=VARCHAR},1,#{createTime,jdbcType=TIMESTAMP})
+	 </insert>
+	 <!-- 提现成功后更新流水号和状态 -->
+	 <update id="updateSaleCash" parameterType="Map">
+	      update t_agent_withdraw set payment_sequence=#{paymentSequence,jdbcType=VARCHAR},status=2,create_time=#{payTime,jdbcType=TIMESTAMP} where id=#{id}
+	 </update>
+	<!-- 根据门店id查询已提现总额 -->
+	<select id="getAgentTotalWithdrawDaoByAgentId" parameterType="Map" resultType="Decimal">
+		SELECT SUM(s.withdraw) AS whthdraw FROM (SELECT w.* FROM t_sales_withdraw AS w LEFT JOIN r_user_agent_role AS r ON w.sales_id=r.sales_id
+		WHERE r.agent_id=#{agentId} GROUP BY w.`id`) AS s
+	</select>
+	<!-- 根据公司id查询已提现总额 -->
+	<select id="getAgentTotalWithdrawDaoByParentAgentId" parameterType="Map" resultType="Decimal">
+		SELECT SUM(withdraw) FROM t_agent_withdraw WHERE agent_id=#{parentAgentId} and status=2
+	</select>
+	<!-- 根据公司id查询所属门店已提现总额 -->
+	<select id="getAllAgentTotalWithdrawDaoByParentAgentId" parameterType="Map" resultType="Decimal">
+		SELECT SUM(s.withdraw) AS whthdraw FROM (SELECT w.* FROM t_sales_withdraw AS w LEFT JOIN r_user_agent_role AS r ON w.sales_id=r.sales_id LEFT JOIN t_agent AS a
+		ON r.agent_id=a.id
+		WHERE a.parent_id=#{parentAgentId} AND w.status=2 GROUP BY w.`id`) AS s
+	</select>
+
+
+	<!--提现记录-->
+
+	<select id="queryAgentWithdrawInfoList" resultMap="InfoResultMap" parameterType="Map" >
+		SELECT
+		t_agent_withdraw.agent_id,
+		t_agent_withdraw.`withdraw`,
+		t_agent_withdraw.`status`,
+		cast(from_base64(t_user.`nick_name`) as char) as nick_name,
+		DATE_FORMAT(t_agent_withdraw.`create_time`, '%Y-%m-%d') create_time
+		FROM
+		`t_agent_withdraw` LEFT JOIN t_user ON t_agent_withdraw.open_id=t_user.user_name
+		WHERE
+		t_agent_withdraw.`agent_id`=#{agentId}
+		<if test="startTime != null and startTime != ''"> AND t_agent_withdraw.`create_time` >= #{startTime}</if>
+		<if test="endTime != null  and endTime != ''"><![CDATA[ AND t_agent_withdraw.`create_time` <= #{endTime}]]></if>
+		ORDER BY t_agent_withdraw.`create_time` DESC
+	</select>
+
+	<!--后台管理提现记录-->
+	<select id="withdrawList"  resultMap="ResultMap" parameterType="Map" >
+		SELECT 	`id`,
+		`agent_id`,
+		`open_id`,
+		`agent_name`,
+		`status`,
+		`withdraw`,
+		`payment_no`,
+		`payment_type`,
+		`payment_sequence`,
+		`create_time`
+		FROM
+		`ecommerce`.`t_agent_withdraw`
+		WHERE 1 = 1
+		<if test="agentId != null and agentId > 0"> AND agent_id = #{salesId, jdbcType=INTEGER}</if>
+		<if test="status != null and status > 0"> AND status = #{status, jdbcType=INTEGER}</if>
+		ORDER BY create_time DESC
+	</select>
+
+</mapper>

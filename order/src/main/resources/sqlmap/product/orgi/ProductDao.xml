@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.product.orgi.ProductMapper">
+  <!-- 列表数据返回map -->
+  <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.product.entity.ProductEntity" >
+   <id column="id" property="id" jdbcType="INTEGER" />
+   <result column="name" property="name" jdbcType="VARCHAR"/>
+   <result column="code" property="code" jdbcType="VARCHAR"/>
+   <result column="images" property="images" jdbcType="VARCHAR"/>
+   <result column="small_picture" property="smallPicture" jdbcType="VARCHAR"/>
+   <result column="brand" property="brand" jdbcType="VARCHAR"/>
+   <result column="norms" property="norms" jdbcType="VARCHAR"/>
+   <result column="month" property="month" jdbcType="INTEGER"/>
+   <result column="is_presell" property="isPresell" jdbcType="INTEGER"/>
+   <result column="is_limit_coupon" property="islimitCoupon" jdbcType="INTEGER"/>
+   <result column="introduction" property="introduction" jdbcType="VARCHAR"/>
+   <result column="status" property="status" jdbcType="INTEGER"/>
+   <result column="actions" property="actions" jdbcType="INTEGER"/>
+   <result column="type" property="type" jdbcType="INTEGER"/>
+   <result column="selling_price" property="sellingPrice" jdbcType="DECIMAL"/>
+   <result column="discount_enabled" property="discountEnabled" jdbcType="INTEGER"/>
+   <result column="discount_price" property="discountPrice" jdbcType="DECIMAL"/>
+   <result column="discount_start" property="discountStart" jdbcType="VARCHAR"/>
+   <result column="discount_end" property="discountEnd" jdbcType="VARCHAR"/>
+   <result column="share_content" property="shareContent" jdbcType="VARCHAR"/>
+   <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+  </resultMap>
+  <!-- 详情数据返回map -->
+  <resultMap type="com.weichuang.ecommerce.product.entity.ProductEntity" id="DetailMap">
+   <id column="id" property="id" jdbcType="INTEGER" />
+   <result column="name" property="name" jdbcType="VARCHAR"/>
+   <result column="code" property="code" jdbcType="VARCHAR"/>
+   <result column="small_picture" property="smallPicture" jdbcType="VARCHAR"/>
+   <result column="images" property="images" jdbcType="VARCHAR"/>
+   <result column="brand" property="brand" jdbcType="VARCHAR"/>
+   <result column="norms" property="norms" jdbcType="VARCHAR"/>
+   <result column="is_presell" property="isPresell" jdbcType="INTEGER"/>
+   <result column="is_limit_coupon" property="islimitCoupon" jdbcType="INTEGER"/>
+   <result column="month" property="month" jdbcType="VARCHAR"/>
+   <result column="deploy" property="deploy" jdbcType="VARCHAR"/>
+   <result column="weight" property="weight" jdbcType="VARCHAR"/>
+   <result column="shelf_life" property="shelfLife" jdbcType="VARCHAR"/>
+   <result column="introduction" property="introduction" jdbcType="VARCHAR"/>
+   <result column="storage" property="storage" jdbcType="VARCHAR"/>
+   <result column="description" property="description" jdbcType="VARCHAR"/>
+   <result column="status" property="status" jdbcType="INTEGER"/>
+   <result column="actions" property="actions" jdbcType="INTEGER"/>
+   <result column="type" property="type" jdbcType="INTEGER"/>
+   <result column="cost_price" property="costPrice" jdbcType="DECIMAL"/>
+   <result column="selling_price" property="sellingPrice" jdbcType="DECIMAL"/>
+   <result column="discount_enabled" property="discountEnabled" jdbcType="INTEGER"/>
+   <result column="discount_price" property="discountPrice" jdbcType="DECIMAL"/>
+   <result column="discount_start" property="discountStart" jdbcType="VARCHAR"/>
+   <result column="discount_end" property="discountEnd" jdbcType="VARCHAR"/>
+   <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+   <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+   <result column="share_content" property="shareContent" jdbcType="VARCHAR"/>
+   <result column="buy_explain" property="buyExplain" jdbcType="VARCHAR"/>
+  </resultMap>
+  <!-- 管理列表显示 -->
+	  <select id="getProductList" resultMap="BaseResultMap" parameterType="Map">
+		   SELECT id,`name`,`code`,small_picture,images,brand,norms,month,is_presell,is_limit_coupon,introduction,`status`,actions,type,selling_price,discount_price,create_time FROM t_product WHERE 1=1
+		    <if test="name !=null and name != ''"> AND INSTR(name,#{name})</if>
+		    <if test="status !=null and status>0"> AND status=#{status}</if>
+		    <if test="startTime != null and startTime !='' "> AND create_time >= #{startTime}</if>
+	        <if test="endTime != null  and endTime !='' "><![CDATA[ AND create_time <= #{endTime}]]></if>
+		    ORDER BY sort DESC,id DESC
+	  </select>
+  
+  <!-- 前台显示列表,并把结果按照sort倒叙排列,数据必须是已上架状态-->
+	 <select id="productList" resultMap="BaseResultMap" parameterType="Map">
+	     SELECT id,`name`,`code`,small_picture,images,brand,norms,share_content,is_presell,is_limit_coupon,month,introduction,actions,type,selling_price,discount_enabled,discount_price,discount_start,discount_end FROM t_product WHERE `status`=1 
+	       <if test="productIds !=null and productIds != ''"> AND find_in_set(id,#{productIds}) </if>
+	     ORDER BY sort DESC,id DESC
+	 </select>
+  
+  <!-- 查询是单品以供添加套餐时候使用 -->
+      <select id="getProductSingleList" resultMap="BaseResultMap">
+          SELECT id,`code`,`name`,norms,month FROM t_product WHERE  type=1 
+      </select>
+  
+  <!-- 根据主键查询详情 -->
+	  <select id="getProductInfo" resultMap="DetailMap" parameterType="Map" >
+		  SELECT id,`name`,`code`,small_picture,images,brand,norms,month,is_presell,is_limit_coupon,deploy,buy_explain,weight,shelf_life,introduction,`storage`,description,`status`,actions,type,cost_price,selling_price,discount_enabled,
+		  discount_price,discount_start,discount_end,create_time,update_time,share_content FROM t_product WHERE 1=1
+		   <if test="productId != null and productId > 0">  and id =#{productId}</if>
+		   <if test="productCode != null and productCode !=''">  and code =#{productCode}</if>
+	  </select>
+  
+  <!-- 增加商品-->
+	  <insert id="addProduct" parameterType="com.weichuang.ecommerce.product.entity.ProductEntity" useGeneratedKeys="true" keyProperty="id">
+	      INSERT INTO t_product (name,code,small_picture,is_limit_coupon,images,brand,norms,month,deploy,weight,shelf_life,introduction,`storage`,description,`status`,sort,actions,type,cost_price,selling_price,discount_enabled,
+		  discount_price,discount_start,discount_end,create_time,share_content,buy_explain,is_presell)
+	      VALUES (#{name,jdbcType=VARCHAR},#{code,jdbcType=VARCHAR},#{smallPicture,jdbcType=VARCHAR},#{islimitCoupon,jdbcType=INTEGER},#{images,jdbcType=VARCHAR},#{brand,jdbcType=VARCHAR},#{norms,jdbcType=VARCHAR},#{month,jdbcType=VARCHAR},#{deploy,jdbcType=VARCHAR},
+	      #{weight,jdbcType=VARCHAR},#{shelfLife,jdbcType=VARCHAR},#{introduction,jdbcType=VARCHAR},#{storage,jdbcType=VARCHAR},#{description,jdbcType=VARCHAR},2,1,
+	      #{actions,jdbcType=INTEGER},#{type,jdbcType=INTEGER},#{costPrice,jdbcType=DECIMAL},#{sellingPrice,jdbcType=DECIMAL},#{discountEnabled,jdbcType=INTEGER},#{discountPrice,jdbcType=DECIMAL},
+	      #{discountStart,jdbcType=VARCHAR},#{discountEnd,jdbcType=VARCHAR},now(),#{shareContent,jdbcType=VARCHAR},#{buyExplain,jdbcType=VARCHAR},#{isPresell,jdbcType=INTEGER})
+	  </insert>
+  
+  <!-- 根据主键修改商品 -->
+	  <update id="updateProduct" parameterType="com.weichuang.ecommerce.product.entity.ProductEntity" >
+		    UPDATE t_product
+		    <set>
+			    <if test="name != null and name !='' " >name = #{name,jdbcType=VARCHAR},</if>
+			    <if test="images != null and images !='' " > images= #{images,jdbcType=VARCHAR},</if>
+			    <if test="smallPicture != null and smallPicture !='' " > small_picture= #{smallPicture,jdbcType=VARCHAR},</if>
+			    <if test="brand != null and brand !='' " > brand= #{brand,jdbcType=VARCHAR},</if>
+			    <if test="norms != null and norms !='' " > norms= #{norms,jdbcType=VARCHAR},</if>
+			    <if test="month != null and month !='' " >month = #{month,jdbcType=VARCHAR},</if>
+			    <if test="deploy != null and deploy !='' " >deploy = #{deploy,jdbcType=VARCHAR},</if>
+			    <if test="weight != null and weight !='' " >weight = #{weight,jdbcType=VARCHAR},</if>
+			    <if test="shelfLife != null and shelfLife !='' " > shelf_life= #{shelfLife,jdbcType=VARCHAR},</if>
+			    <if test="introduction != null and introduction !=''" >introduction = #{introduction,jdbcType=VARCHAR},</if>
+			    <if test="description != null and description !=''" >description = #{description,jdbcType=VARCHAR},</if>
+			    <if test="storage != null and storage !=''" >storage = #{storage,jdbcType=VARCHAR},</if>
+		        <if test="type != null and type >0" >type = #{type,jdbcType=INTEGER},</if>
+		        <if test="isPresell != null and isPresell >0" >is_presell = #{isPresell,jdbcType=INTEGER},</if>
+		        <if test="islimitCoupon != null and islimitCoupon >0" >is_limit_coupon = #{islimitCoupon,jdbcType=INTEGER},</if>
+		        <if test="actions != null and actions >0" >actions  = #{actions,jdbcType=INTEGER},</if>
+		        <if test="costPrice != null" >cost_price = #{costPrice,jdbcType=DECIMAL},</if>
+		        <if test="sellingPrice != null">selling_price = #{sellingPrice,jdbcType=DECIMAL},</if>
+		        <if test="discountEnabled != null and discountEnabled >0" >discount_enabled = #{discountEnabled,jdbcType=INTEGER},</if>
+		         discount_price = #{discountPrice,jdbcType=DECIMAL},
+		         discount_start = #{discountStart,jdbcType=VARCHAR},
+		         discount_end = #{discountEnd,jdbcType=VARCHAR},
+		         update_time = now(),
+		        <if test="shareContent != null and shareContent !=''" >share_content = #{shareContent,jdbcType=VARCHAR},</if>
+		        <if test="buyExplain != null and buyExplain !=''" >buy_explain = #{buyExplain,jdbcType=VARCHAR},</if>
+		    </set>
+		     WHERE id = #{id,jdbcType=INTEGER}
+	  </update>
+	  
+  <!-- 批量设置上下架 -->
+	  <update id="updateProductStatus" parameterType="Map">
+		   UPDATE t_product SET `status`=#{status} WHERE id IN
+		<foreach item="item" index="index" collection="productIds" open="(" separator="," close=")">
+              #{item}
+        </foreach>
+      </update>
+      
+  <!-- 置顶功能 -->
+	  <update id="updateHotById" parameterType="Map">
+		   UPDATE t_product SET sort=#{maxSort}+1 WHERE id = #{productId,jdbcType=INTEGER} 
+      </update>
+      
+  <!-- 查询出最大排序数 -->
+	  <select id="maxSort" resultType="int">
+		   <![CDATA[ SELECT max(sort) as sort FROM t_product]]>
+	  </select>
+</mapper>

@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.weichuang.ecommerce.barcode.SalesPullNewcEntityMapper" >
+  <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.barcode.entity.SalesPullNewcEntity" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="aid" property="aid" jdbcType="INTEGER" />
+    <result column="sale_id" property="saleId" jdbcType="INTEGER" />
+    <result column="code_key" property="codeKey" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="inviteType" property="invitetype" jdbcType="INTEGER" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="use_time" property="useTime" jdbcType="TIMESTAMP" />
+    <result column="ctime" property="ctime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="InviteListResultMap" type="com.weichuang.ecommerce.barcode.entity.InviteListEntity">
+    <result column="icon_url" property="iconUrl" jdbcType="VARCHAR" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+    <result column="ctime" property="ctime" jdbcType="VARCHAR" />
+    <result column="sale_id" property="saleId" jdbcType="INTEGER" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="SalesInvteNewCountResultMap" type="com.weichuang.ecommerce.barcode.entity.SalesInvteNewCountEntity">
+    <result column="day_count" property="dayCount" jdbcType="INTEGER" />
+    <result column="all_count" property="allCount" jdbcType="INTEGER" />
+    <result column="can_use_income" property="canUseIncome" jdbcType="DECIMAL" />
+    <result column="all_income" property="allIncome" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id,aid, sale_id, code_key, user_id, mobile, inviteType, state, use_time, ctime
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_sales_pull_newc
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <!--邀新统计-->
+  <select id="selectInviteNewCountByType" parameterType="map" resultMap="SalesInvteNewCountResultMap" >
+    select
+    (
+      select count(daycount.user_id) from
+      (
+          select
+          u.id,
+          u.user_name,
+          newc.user_id,
+          agent.id as agent_id,
+          agent.agent_name as agent_name,
+          parent_agent.id as parent_agent_id,
+          parent_agent.agent_name as parent_agent_name,
+          newc.ctime
+          from
+          t_sales_pull_newc newc
+          left join t_user u on newc.sale_id=u.id
+          left join r_user_agent_role role on u.id=role.user_id
+          left join t_agent agent on role.agent_id=agent.id
+          left join t_agent parent_agent on agent.parent_id=parent_agent.id
+          where newc.state=1
+          <if test="type!=null and type==1">
+            and parent_agent.id=#{id}
+          </if>
+          <if test="type!=null and type==2">
+           and agent.id=#{id}
+          </if>
+          <if test="type!=null and type==4">
+            and newc.sale_id=#{id}
+          </if>
+          and DATE_FORMAT(newc.ctime,'%Y-%m-%d')=DATE_FORMAT(now(),'%Y-%m-%d')
+      ) daycount
+    ) as day_count,
+    (
+      select count(allcount.user_id) from
+      (
+          select
+          u.id,
+          u.user_name,
+          newc.user_id,
+          agent.id as agent_id,
+          agent.agent_name as agent_name,
+          parent_agent.id as parent_agent_id,
+          parent_agent.agent_name as parent_agent_name,
+          newc.ctime
+          from
+          t_sales_pull_newc newc
+          left join t_user u on newc.sale_id=u.id
+          left join r_user_agent_role role on u.id=role.user_id
+          left join t_agent agent on role.agent_id=agent.id
+          left join t_agent parent_agent on agent.parent_id=parent_agent.id
+          where newc.state=1
+          <if test="type!=null and type==1">
+            and parent_agent.id=#{id}
+          </if>
+          <if test="type!=null and type==2">
+            and agent.id=#{id}
+          </if>
+          <if test="type!=null and type==4">
+            and newc.sale_id=#{id}
+          </if>
+      ) allcount
+    ) as all_count,
+    (
+    <if test="type!=null and type==1">
+      select ifnull(sum(user_income),0) as user_income
+      from
+      (
+      select
+      users.id as user_id,
+      (
+      select IFNULL(sum(sets.pull_new_income),0) from t_sale_red_envelope_rece rece
+      left join t_sales_pull_new_set sets
+      on rece.rid=sets.id where rece.state=0 and rece.sales_id=users.id
+      ) as user_income,
+      agents.id as agent_id,
+      agents.agent_name,
+      parent_agents.id as agent_parent_id,
+      parent_agents.agent_name as parent_name
+      from t_user users
+      left join r_user_agent_role roles on users.id=roles.user_id
+      left join t_agent agents on roles.agent_id=agents.id
+      left join t_agent parent_agents on agents.parent_id=parent_agents.id
+      where roles.role_id=5
+      ) pullnew where pullnew.agent_parent_id=#{id}
+    </if>
+    <if test="type!=null and type==2">
+      select ifnull(sum(user_income),0) as user_income
+      from
+      (
+      select
+      users.id as user_id,
+      (
+      select IFNULL(sum(sets.pull_new_income),0) from t_sale_red_envelope_rece rece
+      left join t_sales_pull_new_set sets
+      on rece.rid=sets.id where rece.state=0 and rece.sales_id=users.id
+      ) as user_income,
+      agents.id as agent_id,
+      agents.agent_name,
+      parent_agents.id as agent_parent_id,
+      parent_agents.agent_name as parent_name
+      from t_user users
+      left join r_user_agent_role roles on users.id=roles.user_id
+      left join t_agent agents on roles.agent_id=agents.id
+      left join t_agent parent_agents on agents.parent_id=parent_agents.id
+      where roles.role_id=5
+      ) pullnew where pullnew.agent_id=#{id}
+    </if>
+    <if test="type!=null and type==3">
+      select ifnull(sum(user_income),0) as user_income
+      from
+      (
+      select
+      users.id as user_id,
+      (
+      select IFNULL(sum(sets.pull_new_income),0) from t_sale_red_envelope_rece rece
+      left join t_sales_pull_new_set sets
+      on rece.rid=sets.id where rece.state=0 and rece.sales_id=users.id
+      ) as user_income,
+      agents.id as agent_id,
+      agents.agent_name,
+      parent_agents.id as agent_parent_id,
+      parent_agents.agent_name as parent_name
+      from t_user users
+      left join r_user_agent_role roles on users.id=roles.user_id
+      left join t_agent agents on roles.agent_id=agents.id
+      left join t_agent parent_agents on agents.parent_id=parent_agents.id
+      where roles.role_id=5
+      ) pullnew
+    </if>
+    <if test="type!=null and type==4">
+      select ifnull(sum(user_income),0) as user_income
+      from
+      (
+      select
+      users.id as user_id,
+      (
+      select IFNULL(sum(sets.pull_new_income),0) from t_sale_red_envelope_rece rece
+      left join t_sales_pull_new_set sets
+      on rece.rid=sets.id where rece.state=0 and rece.sales_id=users.id
+      ) as user_income,
+      agents.id as agent_id,
+      agents.agent_name,
+      parent_agents.id as agent_parent_id,
+      parent_agents.agent_name as parent_name
+      from t_user users
+      left join r_user_agent_role roles on users.id=roles.user_id
+      left join t_agent agents on roles.agent_id=agents.id
+      left join t_agent parent_agents on agents.parent_id=parent_agents.id
+      where roles.role_id=5
+      ) pullnew where pullnew.user_id=#{id}
+    </if>
+    ) as can_use_income,
+    (
+      <if test="type!=null and type==1">
+        select ifnull(sum(user_income),0)  as user_income
+        from
+        (
+          select
+          users.id as user_id,
+          (
+          select IFNULL(sum(sets.pull_new_income),0) from t_sale_red_envelope_rece rece
+          left join t_sales_pull_new_set sets
+          on rece.rid=sets.id where rece.state=1 and rece.sales_id=users.id
+          ) as user_income,
+          agents.id as agent_id,
+          agents.agent_name,
+          parent_agents.id as agent_parent_id,
+          parent_agents.agent_name as parent_name
+          from t_user users
+          left join r_user_agent_role roles on users.id=roles.user_id
+          left join t_agent agents on roles.agent_id=agents.id
+          left join t_agent parent_agents on agents.parent_id=parent_agents.id
+          where roles.role_id=5
+        ) pullnew where pullnew.agent_parent_id=#{id}
+      </if>
+      <if test="type!=null and type==2">
+        select ifnull(sum(user_income),0)  as user_income
+        from
+        (
+        select
+        users.id as user_id,
+        (
+        select IFNULL(sum(sets.pull_new_income),0) from t_sale_red_envelope_rece rece
+        left join t_sales_pull_new_set sets
+        on rece.rid=sets.id where rece.state=1 and rece.sales_id=users.id
+        ) as user_income,
+        agents.id as agent_id,
+        agents.agent_name,
+        parent_agents.id as agent_parent_id,
+        parent_agents.agent_name as parent_name
+        from t_user users
+        left join r_user_agent_role roles on users.id=roles.user_id
+        left join t_agent agents on roles.agent_id=agents.id
+        left join t_agent parent_agents on agents.parent_id=parent_agents.id
+        where roles.role_id=5
+        ) pullnew where pullnew.agent_id=#{id}
+      </if>
+    <if test="type!=null and type==3">
+      select ifnull(sum(user_income),0)  as user_income
+      from
+      (
+      select
+      users.id as user_id,
+      (
+      select IFNULL(sum(sets.pull_new_income),0) from t_sale_red_envelope_rece rece
+      left join t_sales_pull_new_set sets
+      on rece.rid=sets.id where rece.state=1 and rece.sales_id=users.id
+      ) as user_income,
+      agents.id as agent_id,
+      agents.agent_name,
+      parent_agents.id as agent_parent_id,
+      parent_agents.agent_name as parent_name
+      from t_user users
+      left join r_user_agent_role roles on users.id=roles.user_id
+      left join t_agent agents on roles.agent_id=agents.id
+      left join t_agent parent_agents on agents.parent_id=parent_agents.id
+      where roles.role_id=5
+      ) pullnew
+    </if>
+      <if test="type!=null and type==4">
+        select ifnull(sum(user_income),0)  as user_income
+        from
+        (
+        select
+        users.id as user_id,
+        (
+        select IFNULL(sum(sets.pull_new_income),0) from t_sale_red_envelope_rece rece
+        left join t_sales_pull_new_set sets
+        on rece.rid=sets.id where rece.state=1 and rece.sales_id=users.id
+        ) as user_income,
+        agents.id as agent_id,
+        agents.agent_name,
+        parent_agents.id as agent_parent_id,
+        parent_agents.agent_name as parent_name
+        from t_user users
+        left join r_user_agent_role roles on users.id=roles.user_id
+        left join t_agent agents on roles.agent_id=agents.id
+        left join t_agent parent_agents on agents.parent_id=parent_agents.id
+        where roles.role_id=5
+        ) pullnew where pullnew.user_id=#{id}
+      </if>
+    ) as all_income
+
+  </select>
+  <select id="selectByCodekey" parameterType="string" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_sales_pull_newc
+    where code_key=#{codekey}
+  </select>
+  <select id="selectInviteNewCount" parameterType="com.weichuang.ecommerce.barcode.entity.SalesPullNewcEntity" resultType="int">
+  select count(*) from t_sales_pull_newc where aid=#{aid} and sale_id=#{saleId} and state=1
+  </select>
+  <select id="selectInviteList" parameterType="map" resultMap="InviteListResultMap">
+    select
+    u.icon_url ,
+    u.nick_name ,
+    p.ctime,
+    p.sale_id,
+    p.state
+    from
+      t_sales_pull_newc p
+    left join
+      t_user u
+    on p.user_id=u.id
+      where 1=1
+    <if test="saleId!=null">
+      and p.sale_id=#{saleId}
+    </if>
+    <if test="state!=null">
+      and p.state=#{state}
+    </if>
+    order by p.ctime desc
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_sales_pull_newc
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.weichuang.ecommerce.barcode.entity.SalesPullNewcEntity" >
+    insert into t_sales_pull_newc (id, sale_id, code_key, 
+      user_id, mobile, inviteType, 
+      state, use_time, ctime
+      )
+    values (#{id,jdbcType=INTEGER}, #{saleId,jdbcType=INTEGER}, #{codeKey,jdbcType=VARCHAR}, 
+      #{userId,jdbcType=INTEGER}, #{mobile,jdbcType=VARCHAR}, #{invitetype,jdbcType=TINYINT}, 
+      #{state,jdbcType=TINYINT}, #{useTime,jdbcType=TIMESTAMP}, #{ctime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.weichuang.ecommerce.barcode.entity.SalesPullNewcEntity" >
+    insert into t_sales_pull_newc
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      aid,
+      <if test="saleId != null" >
+        sale_id,
+      </if>
+      <if test="codeKey != null" >
+        code_key,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="mobile != null" >
+        mobile,
+      </if>
+      <if test="invitetype != null" >
+        inviteType,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="useTime != null" >
+        use_time,
+      </if>
+        ctime
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      (select id from t_red_envelope_activiti where state=1 order by ctime desc limit 1),
+      <if test="saleId != null" >
+        #{saleId,jdbcType=INTEGER},
+      </if>
+      <if test="codeKey != null" >
+        #{codeKey,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="mobile != null" >
+        #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="invitetype != null" >
+        #{invitetype,jdbcType=TINYINT},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=TINYINT},
+      </if>
+      <if test="useTime != null" >
+        #{useTime,jdbcType=TIMESTAMP},
+      </if>
+      now()
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.weichuang.ecommerce.barcode.entity.SalesPullNewcEntity" >
+    update t_sales_pull_newc
+    <set >
+      <if test="saleId != null" >
+        sale_id = #{saleId,jdbcType=INTEGER},
+      </if>
+      <if test="codeKey != null" >
+        code_key = #{codeKey,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="mobile != null" >
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="invitetype != null" >
+        inviteType = #{invitetype,jdbcType=TINYINT},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=TINYINT},
+      </if>
+      <if test="useTime != null" >
+        use_time = #{useTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ctime != null" >
+        ctime = #{ctime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.weichuang.ecommerce.barcode.entity.SalesPullNewcEntity" >
+    update t_sales_pull_newc
+    set sale_id = #{saleId,jdbcType=INTEGER},
+      code_key = #{codeKey,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=INTEGER},
+      mobile = #{mobile,jdbcType=VARCHAR},
+      inviteType = #{invitetype,jdbcType=TINYINT},
+      state = #{state,jdbcType=TINYINT},
+      use_time = #{useTime,jdbcType=TIMESTAMP},
+      ctime = #{ctime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateInviteNew" parameterType="com.weichuang.ecommerce.barcode.entity.SalesPullNewcEntity">
+    update
+    t_sales_pull_newc
+    set
+    state=#{state},
+    user_id=#{userId}
+    <if test="state==1">
+      ,use_time=now()
+    </if>
+     where code_key=#{codeKey}
+  </update>
+</mapper>

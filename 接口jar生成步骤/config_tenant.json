@@ -1,0 +1,8 @@
+{
+	"apiPackage":"com.weichuang.ecommerce.tenant.api",
+	"invokerPackage":"com.weichuang.ecommerce.tenant.invoker",
+	"modelPackage":"com.weichuang.ecommerce.tenant.entity",
+	"dateLibrary":"legacy", 
+	"serializableModel":true,
+	"fullJavaUtil":true
+}

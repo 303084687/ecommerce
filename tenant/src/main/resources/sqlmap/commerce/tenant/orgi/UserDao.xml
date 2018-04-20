@@ -1,0 +1,972 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.tenant.orgi.UserMapper">
+
+	<!--用户表基础信息 -->
+	<resultMap id="BaseResultMap"
+		type="com.weichuang.ecommerce.tenant.entity.UserEntity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="VARCHAR" />
+		<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+		<result column="real_name" property="realName" jdbcType="VARCHAR" />
+		<result column="gender" property="gender" jdbcType="INTEGER" />
+		<result column="icon_url" property="iconUrl" jdbcType="VARCHAR" />
+		<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="login_time" property="loginTime" jdbcType="TIMESTAMP" />
+		<result column="is_subscribe" property="isSubscribe" jdbcType="INTEGER" />
+		<result column="login_status" property="loginStatus" jdbcType="INTEGER" />
+	</resultMap>
+	<resultMap id="InviteNewResultMap" type="com.weichuang.ecommerce.tenant.entity.InviteNewEntity">
+		<result column="newIs" property="newIs" jdbcType="BOOLEAN" />
+		<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+		<result column="bindTime" property="bindTime" jdbcType="VARCHAR" />
+		<result column="nickName" property="nickName" jdbcType="VARCHAR" />
+		<result column="saleName" property="saleName" jdbcType="VARCHAR" />
+		<result column="saleAgentName" property="saleAgentName" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="ManagerDetailResultMap"
+			   type="com.weichuang.ecommerce.tenant.entity.ManagerDetailEntity">
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="real_name" property="realName" jdbcType="VARCHAR" />
+		<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+		<result column="icon_url" property="iconUrl" jdbcType="VARCHAR" />
+		<result column="agent_id" property="agentId" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+		<result column="receiver_accountid" property="receiverAccountid" jdbcType="INTEGER" />
+		<result column="receiver_nickname" property="receiverNickname" jdbcType="VARCHAR" />
+		<result column="receiver_openid" property="receiverOpenid" jdbcType="VARCHAR" />
+	</resultMap>
+	<!--用户详细信息 -->
+	<resultMap id="UserDetailResultMap"
+		type="com.weichuang.ecommerce.tenant.entity.UserDetailEntity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="VARCHAR" />
+		<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+		<result column="real_name" property="realName" jdbcType="VARCHAR" />
+		<result column="gender" property="gender" jdbcType="INTEGER" />
+		<result column="icon_url" property="iconUrl" jdbcType="VARCHAR" />
+		<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="login_time" property="loginTime" jdbcType="TIMESTAMP" />
+		<result column="login_status" property="loginStatus" jdbcType="INTEGER" />
+
+		<result column="agent_id" property="agentId" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+		<result column="role_id" property="roleId" jdbcType="INTEGER" />
+		<result column="role_name" property="roleName" jdbcType="VARCHAR" />
+		<result column="sales_id" property="salesId" jdbcType="INTEGER" />
+		<result column="sales_name" property="salesName" jdbcType="VARCHAR" />
+		<result column="referrer_id" property="referrerId" jdbcType="INTEGER" />
+		<result column="referrer_name" property="referrerName"
+			jdbcType="VARCHAR" />
+		<result column="receiver_accountid" property="receiverAccountid" jdbcType="INTEGER" />
+
+		<result column="open_id" property="openId" jdbcType="VARCHAR" />
+		<result column="union_id" property="unionId" jdbcType="VARCHAR" />
+		<result column="app_open_id" property="appOpenId" jdbcType="VARCHAR" />
+		<result column="register_type" property="registerType"
+			jdbcType="INTEGER" />
+	</resultMap>
+	<!--用户详细信息 -->
+	<resultMap id="UserNewDetailResultMap"
+			   type="com.weichuang.ecommerce.tenant.entity.UserNewDetailEntity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="VARCHAR" />
+		<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+		<result column="real_name" property="realName" jdbcType="VARCHAR" />
+		<result column="gender" property="gender" jdbcType="INTEGER" />
+		<result column="icon_url" property="iconUrl" jdbcType="VARCHAR" />
+		<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="login_time" property="loginTime" jdbcType="TIMESTAMP" />
+		<result column="login_status" property="loginStatus" jdbcType="INTEGER" />
+
+		<result column="agent_id" property="agentId" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+		<result column="role_id" property="roleId" jdbcType="INTEGER" />
+		<result column="role_name" property="roleName" jdbcType="VARCHAR" />
+		<result column="sales_id" property="salesId" jdbcType="INTEGER" />
+		<result column="sales_name" property="salesName" jdbcType="VARCHAR" />
+		<result column="referrer_id" property="referrerId" jdbcType="INTEGER" />
+		<result column="referrer_name" property="referrerName"
+				jdbcType="VARCHAR" />
+		<result column="receiver_accountid" property="receiverAccountid" jdbcType="INTEGER" />
+
+		<result column="open_id" property="openId" jdbcType="VARCHAR" />
+		<result column="union_id" property="unionId" jdbcType="VARCHAR" />
+		<result column="app_open_id" property="appOpenId" jdbcType="VARCHAR" />
+		<result column="register_type" property="registerType"
+				jdbcType="INTEGER" />
+		<result column="referrer_named" property="referrerNamed" jdbcType="VARCHAR" />
+	</resultMap>
+	<!--全部会员列表信息 -->
+	<resultMap id="UserAllResultMap"
+		type="com.weichuang.ecommerce.tenant.entity.UserAllEntity">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+		<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+		<result column="gender" property="gender" jdbcType="INTEGER" />
+		<result column="icon_url" property="iconUrl" jdbcType="VARCHAR" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="real_name" property="realName" jdbcType="VARCHAR" />
+		<result column="descripe" property="descripe" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="order_time" property="orderTime" jdbcType="VARCHAR" />
+		<result column="sale_id" property="saleId" jdbcType="INTEGER" />
+		<result column="sale_name" property="saleName" jdbcType="VARCHAR" />
+		<result column="login_status" property="loginStatus" jdbcType="INTEGER" />
+		<result column="agent_id" property="agentId" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+		<result column="parentAgent_id" property="parentAgentId"
+			jdbcType="INTEGER" />
+		<result column="parentAgent_name" property="parentAgentName"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!--员工详细信息（含所推广会员） -->
+	<resultMap id="SalesResultMap"
+		type="com.weichuang.ecommerce.tenant.entity.SalesEntity">
+		<id column="sales_salesId" property="id" jdbcType="INTEGER" />
+		<result column="sales_userName" property="userName" jdbcType="VARCHAR" />
+		<result column="sales_password" property="password" jdbcType="VARCHAR" />
+		<result column="sales_nickName" property="nickName" jdbcType="VARCHAR" />
+		<result column="sales_realName" property="realName" jdbcType="VARCHAR" />
+		<result column="sales_gender" property="gender" jdbcType="INTEGER" />
+		<result column="sales_iconUrl" property="iconUrl" jdbcType="VARCHAR" />
+		<result column="sales_mobile" property="mobile" jdbcType="VARCHAR" />
+		<result column="sales_email" property="email" jdbcType="VARCHAR" />
+		<result column="sales_createTime" property="createTime"
+			jdbcType="TIMESTAMP" />
+		<result column="sales_loginTime" property="loginTime" jdbcType="TIMESTAMP" />
+		<result column="sales_loginStatus" property="loginStatus"
+			jdbcType="INTEGER" />
+		<result column="sales_descripe" property="descripe" jdbcType="VARCHAR" />
+		<result column="agent_id" property="agentId" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+		<result column="parentAgent_id" property="parentAgentId"
+			jdbcType="INTEGER" />
+		<result column="parentAgent_name" property="parentAgentName"
+			jdbcType="VARCHAR" />
+		<result column="role_id" property="roleId" jdbcType="INTEGER" />
+		<result column="role_name" property="roleName" jdbcType="VARCHAR" />
+		<result column="sales_id" property="salesId" jdbcType="INTEGER" />
+		<result column="sales_name" property="salesName" jdbcType="VARCHAR" />
+		<result column="referrer_id" property="referrerId" jdbcType="INTEGER" />
+		<result column="referrer_name" property="referrerName"
+			jdbcType="VARCHAR" />
+		<result column="open_id" property="openId" jdbcType="VARCHAR" />
+		<result column="register_type" property="registerType"
+			jdbcType="INTEGER" />
+		<result column="user_count" property="userCount" jdbcType="INTEGER" />
+
+
+	</resultMap>
+	
+	<!--员工详细信息（含会员数量） -->
+	<resultMap id="SalesCountResultMap"
+		type="com.weichuang.ecommerce.tenant.entity.SalesEntity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+
+
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="real_name" property="realName" jdbcType="VARCHAR" />
+		
+		<result column="icon_url" property="iconUrl" jdbcType="VARCHAR" />
+		<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+		
+		<result column="create_time" property="createTime"
+			jdbcType="TIMESTAMP" />
+		
+		<result column="login_status" property="loginStatus"
+			jdbcType="INTEGER" />
+		<result column="descripe" property="descripe" jdbcType="VARCHAR" />
+		<result column="agent_id" property="agentId" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+		<result column="parentAgent_id" property="parentAgentId"
+			jdbcType="INTEGER" />
+		<result column="parentAgent_name" property="parentAgentName"
+			jdbcType="VARCHAR" />
+		
+		<result column="user_count" property="userCount" jdbcType="INTEGER" />
+
+
+	</resultMap>
+
+
+	<!--员工详细信息（） -->
+	<resultMap id="SalesDetailResultMap"
+		type="com.weichuang.ecommerce.tenant.entity.SalesEntity">
+		<id column="sales_salesId" property="id" jdbcType="INTEGER" />
+		<result column="sales_userName" property="userName" jdbcType="VARCHAR" />
+		<result column="sales_password" property="password" jdbcType="VARCHAR" />
+		<result column="sales_nickName" property="nickName" jdbcType="VARCHAR" />
+		<result column="sales_realName" property="realName" jdbcType="VARCHAR" />
+		<result column="sales_gender" property="gender" jdbcType="INTEGER" />
+		<result column="sales_iconUrl" property="iconUrl" jdbcType="VARCHAR" />
+		<result column="sales_mobile" property="mobile" jdbcType="VARCHAR" />
+		<result column="sales_email" property="email" jdbcType="VARCHAR" />
+		<result column="sales_createTime" property="createTime"
+			jdbcType="TIMESTAMP" />
+		<result column="sales_loginTime" property="loginTime" jdbcType="TIMESTAMP" />
+		<result column="sales_loginStatus" property="loginStatus"
+			jdbcType="INTEGER" />
+		<result column="sales_descripe" property="descripe" jdbcType="VARCHAR" />
+		<result column="agent_id" property="agentId" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+		<result column="parentAgent_id" property="parentAgentId"
+			jdbcType="INTEGER" />
+		<result column="parentAgent_name" property="parentAgentName"
+			jdbcType="VARCHAR" />
+		<result column="role_id" property="roleId" jdbcType="INTEGER" />
+		<result column="role_name" property="roleName" jdbcType="VARCHAR" />
+		<result column="sales_id" property="salesId" jdbcType="INTEGER" />
+		<result column="sales_name" property="salesName" jdbcType="VARCHAR" />
+		<result column="referrer_id" property="referrerId" jdbcType="INTEGER" />
+		<result column="referrer_name" property="referrerName"
+			jdbcType="VARCHAR" />
+		<result column="open_id" property="openId" jdbcType="VARCHAR" />
+		<result column="register_type" property="registerType"
+			jdbcType="INTEGER" />
+
+	</resultMap>
+
+	<!--员工基本信息 -->
+	<resultMap id="SalesBaseResultMap"
+		type="com.weichuang.ecommerce.tenant.entity.SalesBaseEntity">
+		<id column="sales_salesId" property="id" jdbcType="INTEGER" />
+		<result column="sales_userName" property="userName" jdbcType="VARCHAR" />
+		<result column="agent_id" property="agentId" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+		<result column="parentAgent_id" property="parentAgentId"
+			jdbcType="INTEGER" />
+		<result column="parentAgent_name" property="parentAgentName"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="UserBase_Column_List">
+		t_user.`id`,
+		t_user.`user_name`,
+		t_user.`password`,
+		t_user.`nick_name`,
+		t_user.`real_name`,
+		t_user.`gender`,
+		t_user.`icon_url`,
+		t_user.`mobile`,
+		t_user.`email`,
+		t_user.`create_time`,
+		t_user.`login_time`,
+		t_user.`login_status`
+	</sql>
+	<sql id="UserDetail_Column_List">
+		t_user.id,
+		t_user.`user_name`,
+		t_user.`password`,
+		t_user.`nick_name`,
+		t_user.`real_name`,
+		t_user.`gender`,
+		t_user.`icon_url`,
+		t_user.`mobile`,
+		t_user.`email`,
+		t_user.`create_time`,
+		t_user.`login_time`,
+		t_user.`login_status`,
+		r_user_agent_role.`agent_id`,
+		r_user_agent_role.`agent_name`,
+		r_user_agent_role.`role_id`,
+		r_user_agent_role.`role_name`,
+		r_user_agent_role.`sales_id`,
+		r_user_agent_role.`sales_name`,
+		r_user_agent_role.`referrer_id`,
+		r_user_agent_role.`referrer_name`,
+		r_user_agent_role.`receiver_accountid`,
+		t_user_third.`open_id`,
+		t_user_third.`union_id`,
+		t_user_third.`app_open_id`,
+		t_user_third.`register_type`
+	</sql>
+	<sql id="UserNewDetail_Column_List">
+		t_user.id,
+		t_user.`user_name`,
+		t_user.`password`,
+		t_user.`nick_name`,
+		t_user.`real_name`,
+		t_user.`gender`,
+		t_user.`icon_url`,
+		t_user.`mobile`,
+		t_user.`email`,
+		t_user.`create_time`,
+		t_user.`login_time`,
+		t_user.`login_status`,
+		r_user_agent_role.`agent_id`,
+		r_user_agent_role.`agent_name`,
+		r_user_agent_role.`role_id`,
+		r_user_agent_role.`role_name`,
+		r_user_agent_role.`sales_id`,
+		r_user_agent_role.`sales_name`,
+		r_user_agent_role.`referrer_id`,
+		r_user_agent_role.`referrer_name`,
+		r_user_agent_role.`receiver_accountid`,
+		t_user_third.`open_id`,
+		t_user_third.`union_id`,
+		t_user_third.`app_open_id`,
+		t_user_third.`register_type`,
+		case r_user_agent_role.`referrer_id`
+		when 0 THEN
+		'直接'
+		ELSE
+		'转介'
+		end as referrer_named
+	</sql>
+
+
+
+	<!-- 增加用户信息 邮箱和电话加密 -->
+	<insert id="addUser" parameterType="com.weichuang.ecommerce.tenant.entity.UserEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `ecommerce`.`t_user`
+		(`user_name`,
+		`password`,
+		`nick_name`,
+		`real_name`,
+		`gender`,
+		`icon_url`,
+		`mobile`,
+		`email`,
+		`create_time`,
+		`login_time`
+		)
+		VALUES
+		(#{userName,jdbcType=VARCHAR},
+		#{password,jdbcType=VARCHAR},
+		#{nickName,jdbcType=VARCHAR},
+		#{realName,jdbcType=VARCHAR},
+		#{gender,jdbcType=INTEGER},
+		#{iconUrl,jdbcType=VARCHAR},
+		#{mobile,jdbcType=VARCHAR},
+		#{email,jdbcType=VARCHAR},
+		#{createTime,jdbcType=TIMESTAMP},
+		#{loginTime,jdbcType=TIMESTAMP}
+		)
+	</insert>
+	<select id="getUserByUserName" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+
+		SELECT
+		<include refid="UserBase_Column_List" />
+		FROM
+		`ecommerce`.`t_user` WHERE user_name=#{userName}
+	</select>
+	<select id="getUserByAgentIdOrRoleId" parameterType="map"
+		resultMap="BaseResultMap">
+		select
+		u.`id`,
+		u.`user_name`,
+		u.`password`,
+		cast(from_base64(u.`nick_name`) as char) as nick_name,
+		u.`real_name`,
+		u.`gender`,
+		u.`icon_url`,
+		u.`mobile`,
+		u.`email`,
+		u.`create_time`,
+		u.`login_time`
+		from t_user u left join r_user_agent_role r on
+		u.id=r.user_id where 1=1
+		<if test="agentId!=null">
+			and r.agent_id=#{agentId}
+		</if>
+		<if test="roleId!=null">
+			and r.role_id=#{roleId}
+		</if>
+	</select>
+	<!--全部会员列表查询 -->
+	<select id="getAllUserList" resultMap="UserAllResultMap"
+		parameterType="com.weichuang.ecommerce.tenant.entity.UserAllEntity">
+		select
+		a.id,
+		a.user_name,
+		cast(from_base64(a.nick_name) as char) as
+		nick_name,
+		a.mobile,
+		a.gender,
+		a.icon_url,
+		a.real_name,
+		a.descripe,
+		DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+		(select
+		DATE_FORMAT(payment_time,'%Y-%m-%d %H:%i:%s') from t_order where
+		user_id=a.id and status=2 order by payment_time desc limit 1) as
+		order_time,
+		b.id as sale_id ,
+		cast(from_base64(b.nick_name) as char) as
+		sale_name,
+
+		a.login_status ,
+		c.id as agent_id,
+		c.agent_name,
+		d.id as
+		parentAgent_id,
+		d.agent_name as parentAgent_name
+		from t_user a
+		left join
+		r_user_agent_role ar
+		on a.id=ar.user_id
+		left JOIN
+		t_user b
+		on
+		ar.sales_id=b.id
+		left JOIN
+		r_user_agent_role rar
+		ON
+		b.id=rar.user_id
+		left
+		join
+		t_agent c
+		on c.id=rar.agent_id
+		left join t_user_role ur
+		on
+		ar.role_id=ur.id
+		left join t_agent d
+		on c.parent_id=d.id
+
+		where
+		ur.role_name='普通用户'
+		<if test="startTime!=null and startTime!=''">
+			and (select create_time from t_order where user_id=a.id
+			order by
+			create_time desc limit 1)&gt;=#{startTime}
+		</if>
+		<if test="endTime!=null and endTime!=''">
+			and (select create_time from t_order where user_id=a.id
+			order by
+			create_time desc limit 1)&lt;=#{endTime}
+		</if>
+		<if test="loginStatus!=null">
+			and a.login_status =#{loginStatus}
+		</if>
+		<if test="parentAgentId!=null">
+			and d.id=#{parentAgentId}
+		</if>
+		<if test="agentId!=null">
+			and c.id =#{agentId}
+		</if>
+		<if test="searchInput!=null and searchInput!=''">
+			and ( a.mobile like concat('%',#{searchInput},'%') or
+			from_base64(a.nick_name) like concat('%',#{searchInput},'%'))
+		</if>
+		<if test="id!=null">
+			and a.id=#{id}
+		</if>
+		order by a.create_time desc
+
+	</select>
+	<select id="getUserById" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+
+		SELECT
+		<include refid="UserBase_Column_List" />
+		FROM
+		`ecommerce`.`t_user` WHERE id=#{userId}
+	</select>
+	<select id="getUserByMobile" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		SELECT
+		<include refid="UserBase_Column_List" />
+		FROM
+		`ecommerce`.`t_user` WHERE mobile=#{mobile}
+	</select>
+	<!-- 根据openId,第三方登陆类型查询用户 -->
+	<select id="getUserByOpenId" parameterType="Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="UserBase_Column_List" />
+		FROM
+		`t_user_third` LEFT JOIN `t_user` ON t_user_third.user_id =
+		t_user.id
+		WHERE t_user_third.open_id=#{openId} AND
+		t_user_third.register_type =
+		#{registerType}
+	</select>
+	<select id="getUserBySearch" parameterType="map" resultMap="UserNewDetailResultMap">
+		SELECT
+		<include refid="UserNewDetail_Column_List" />
+		FROM
+		`t_user` LEFT JOIN `r_user_agent_role` ON `t_user`.id =
+		`r_user_agent_role`.user_id LEFT JOIN `t_user_third` ON `t_user`.id =
+		`t_user_third`.user_id
+		WHERE `t_user_third`.register_type =1
+		<if test="loginStatus!=null ">
+			and `t_user`.login_status=#{loginStatus}
+		</if>
+
+		<if test="saleId!=null and saleId>0">
+			and `r_user_agent_role`.sales_id=#{saleId}
+		</if>
+	</select>
+	<select id="getUserByUnionId" parameterType="Map"
+		resultMap="UserDetailResultMap">
+		SELECT
+		<include refid="UserDetail_Column_List" />
+		FROM
+		`t_user` LEFT JOIN `r_user_agent_role` ON `t_user`.id =
+		`r_user_agent_role`.user_id LEFT JOIN `t_user_third` ON `t_user`.id =
+		`t_user_third`.user_id
+		WHERE `t_user_third`.union_id=#{unionId} and
+		`t_user_third`.register_type= #{registerType}
+	</select>
+	<select id="getManagerDetailById" parameterType="int" resultMap="ManagerDetailResultMap">
+		select
+		ua.user_id,
+		u.real_name,
+		u.nick_name,
+		u.icon_url,
+		ag.id agent_id,
+		ag.agent_name,
+		ua.receiver_accountid,
+		ur.nick_name as receiver_nickname,
+		ur.user_name as receiver_openid
+		from
+		t_user u
+		left join
+		r_user_agent_role  ua
+		on u.id=ua.user_id
+		left join
+		t_agent ag
+		on ua.agent_id=ag.id
+		left join t_user ur on ua.receiver_accountid=ur.id
+		where ua.role_id=6 and u.id=#{userId}
+	</select>
+	<!-- 根据用户名查询用户详情信息 -->
+	<select id="getUserDetailByUserName" parameterType="java.lang.String"
+		resultMap="UserDetailResultMap">
+		SELECT
+		<include refid="UserDetail_Column_List" />
+		FROM
+		`t_user` LEFT JOIN `r_user_agent_role` ON `t_user`.id =
+		`r_user_agent_role`.user_id LEFT JOIN `t_user_third` ON `t_user`.id =
+		`t_user_third`.user_id
+		WHERE `t_user`.user_name=#{userName}
+	</select>
+	<select id="getUserDetailByCompanyIds" resultMap="UserDetailResultMap" parameterType="map">
+		SELECT
+		<include refid="UserDetail_Column_List" />
+		FROM
+		`t_user` LEFT JOIN `r_user_agent_role` ON `t_user`.id =
+		`r_user_agent_role`.user_id LEFT JOIN `t_user_third` ON `t_user`.id =
+		`t_user_third`.user_id
+		where `r_user_agent_role`.agent_id in(
+		select agent.id from t_agent agent where agent.parent_id
+		in
+		<foreach item="item" index="index" collection="ids"
+				 open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		)
+		<if test="type!=null and type==1">
+			and `r_user_agent_role`.role_id=5
+		</if>
+		<if test="type!=null and type==2">
+			and `r_user_agent_role`.role_id=1
+		</if>
+		and `t_user`.login_status=1
+	</select>
+	<!-- 根据角色查询用户信息 -->
+	<select id="getUserDetailByRoleId" parameterType="int"
+		resultMap="UserDetailResultMap">
+		SELECT
+		<include refid="UserDetail_Column_List" />
+		FROM
+		`t_user` LEFT JOIN `r_user_agent_role` ON `t_user`.id =
+		`r_user_agent_role`.user_id LEFT JOIN `t_user_third` ON `t_user`.id =
+		`t_user_third`.user_id
+		WHERE `r_user_agent_role`.role_id=#{roleId} and
+		`t_user`.login_status=1
+	</select>
+	<select id="getUserDetailByRoleIdOrDate" parameterType="map" resultMap="UserDetailResultMap">
+		SELECT
+		<include refid="UserDetail_Column_List" />
+		FROM
+		`t_user` LEFT JOIN `r_user_agent_role` ON `t_user`.id =
+		`r_user_agent_role`.user_id LEFT JOIN `t_user_third` ON `t_user`.id =
+		`t_user_third`.user_id
+		WHERE
+		`r_user_agent_role`.role_id=#{roleId}
+		<if test="timeType!=null and timeType==1">
+			and timestampdiff(hour,`t_user`.create_time,now())&lt;=720
+		</if>
+		<if test="timeType!=null and timeType==2">
+			and timestampdiff(hour,`t_user`.create_time,now())>720
+		</if>
+		and
+		`t_user`.login_status=1
+
+	</select>
+	<!-- 根据userId查询用户详情信息 -->
+	<select id="getUserDetailByUserId" parameterType="java.lang.Integer"
+		resultMap="UserDetailResultMap">
+		SELECT
+		<include refid="UserDetail_Column_List" />
+		FROM
+		`t_user` LEFT JOIN `r_user_agent_role` ON `t_user`.id =
+		`r_user_agent_role`.user_id LEFT JOIN `t_user_third` ON `t_user`.id =
+		`t_user_third`.user_id
+		WHERE `t_user`.id=#{userId}
+	</select>
+	<!-- 根据openId查询用户详情信息 -->
+	<select id="getUserDetailByOpenId" parameterType="Map"
+		resultMap="UserDetailResultMap">
+		SELECT
+		<include refid="UserDetail_Column_List" />
+		FROM
+		`t_user_third` LEFT JOIN `t_user` ON `t_user_third`.user_id =
+		`t_user`.id LEFT JOIN
+		`r_user_agent_role` ON `t_user_third`.user_id =
+		`r_user_agent_role`.user_id
+		WHERE `t_user_third`.open_id=#{openId} AND
+		register_type = #{registerType}
+	</select>
+	<!-- 根据手机号查询用户详情信息 -->
+	<select id="getUserDetailByMobile" parameterType="java.lang.String"
+		resultMap="UserDetailResultMap">
+		SELECT
+		<include refid="UserDetail_Column_List" />
+		FROM
+		`t_user` LEFT JOIN `r_user_agent_role` ON `t_user`.id =
+		`r_user_agent_role`.user_id LEFT JOIN `t_user_third` ON `t_user`.id =
+		`t_user_third`.user_id
+		WHERE `t_user`.mobile=#{mobile}
+	</select>
+	<!-- 更新用户密码 -->
+
+	<update id="updatePasswordByUserName" parameterType="Map">
+		UPDATE
+		t_user SET password=#{password} WHERE user_name=#{userName}
+	</update>
+	<!-- 更新用户密码 -->
+	<update id="updatePasswordByUserId" parameterType="Map">
+		UPDATE t_user
+		SET password=#{password} WHERE id=#{userId}
+	</update>
+	<!--根据用户名更新用户最后登陆时间 -->
+	<update id="updateUserLoginTime" parameterType="Map">
+		UPDATE t_user SET
+		login_time=NOW() WHERE user_name=#{userName}
+	</update>
+
+	<!-- 更新用户电话真实姓名 -->
+	<update id="updateUserMobileByOpenId" parameterType="Map">
+		UPDATE
+		t_user SET mobile=#{mobile},real_name=#{realName} WHERE id=(SELECT
+		user_id FROM t_user_third WHERE t_user_third.open_id=#{openId} AND
+		register_type=#{registerType})
+	</update>
+	<update id="updateUserMobileById" parameterType="com.weichuang.ecommerce.tenant.entity.UserEntity">
+		UPDATE t_user
+		SET mobile=#{mobile} WHERE id=#{id}
+	</update>
+	<!-- 更新用户电话真实姓名 -->
+	<update id="updateUserPasswordByMobile" parameterType="Map">
+		UPDATE
+		t_user SET password=#{password} WHERE mobile=#{mobile}
+	</update>
+	<!--更新用户状态 -->
+	<update id="updateUserStatus" parameterType="com.weichuang.ecommerce.tenant.entity.UserEntity">
+		update t_user set
+		login_status=#{loginStatus} where id=#{id}
+	</update>
+	<!--更新用户备注 -->
+	<update id="updateUserDescripe" parameterType="com.weichuang.ecommerce.tenant.entity.UserEntity">
+		update t_user set
+		descripe=#{descripe} where id=#{id}
+	</update>
+
+	<!-- 更新员工状态 -->
+
+	<update id="updateSalesStatusBySalesId" parameterType="Map">
+		UPDATE
+		`t_user` SET `login_status`=#{loginStatus} WHERE id=#{salesId}
+	</update>
+	<!-- 更新员工所属店面 -->
+
+	<update id="updateSalesAgentBySalesId" parameterType="Map">
+		UPDATE
+		`r_user_agent_role` SET agent_id=#{agentId}, agent_name=#{agentName}
+		WHERE user_id=#{salesId}
+	</update>
+
+	<!-- 更新终端用户所属员工 -->
+
+	<update id="updateUserSalesBySalesId" parameterType="Map">
+		UPDATE
+		`r_user_agent_role` SET agent_id=#{agentId}
+		,agent_name=#{agentName},sales_id=#{salesId},sales_name=#{salesName}
+		WHERE
+		sales_id=#{oldSalesId} and role_id=1
+	</update>
+	<update id="updateUserDetailByOpenId" parameterType="com.weichuang.ecommerce.tenant.entity.UserEntity">
+		update
+		t_user
+		<set>
+			<if test="mobile!=null and mobile!=''">
+				mobile=#{mobile},
+			</if>
+			<if test="password!=null and password!=''">
+				password=#{password},
+			</if>
+			<if test="nickName!=null and nickName!=''">
+				nick_name=#{nickName},
+			</if>
+			<if test="realName!=null and realName!=''">
+				real_name=#{realName},
+			</if>
+			<if test="gender!=null">
+				gender=#{gender},
+			</if>
+			<if test="iconUrl!=null and iconUrl!=''">
+				icon_url=#{iconUrl},
+			</if>
+		</set>
+		where user_name=#{userName}
+	</update>
+	<!-- 根据salesId查询员工详情信息 -->
+	<select id="getSalesInfoBySalesId" parameterType="Map"
+		resultMap="SalesResultMap">
+		SELECT
+		t1.id AS sales_salesId,
+		t1.`user_name` AS
+		sales_userName,
+		t1.`password` AS sales_password,
+		t1.`nick_name` AS
+		sales_nickName,
+		t1.`real_name` AS sales_realName,
+		t1.`gender` AS
+		sales_gender,
+		t1.`icon_url` AS sales_iconUrl,
+		t1.`mobile` AS
+		sales_mobile,
+		t1.`email` AS sales_email,
+		t1.`create_time` AS
+		sales_creatTime,
+		t1.`login_time` AS sales_loginTime,
+		t1.`login_status`
+		AS sales_loginStatus,
+		t1.`descripe` AS sales_descripe,
+
+		r1.`agent_id`,
+		r1.`agent_name`,
+		r1.`role_id`,
+		r1.`role_name`,
+		r1.`sales_id`,
+		r1.`sales_name`,
+		r1.`referrer_id`,
+		r1.`referrer_name`,
+		t_user_third.`open_id`,
+		t_user_third.`register_type`,
+		a2.`agent_name` AS
+		parentAgent_name,
+		a2.`id` AS parentAgent_id,
+		(select count(*) from r_user_agent_role where
+		r_user_agent_role.sales_id=t1.id and r_user_agent_role.role_id=1) as user_count
+
+		FROM
+		`t_user_third` LEFT JOIN `t_user`
+		AS t1 ON `t_user_third`.user_id =
+		t1.id LEFT JOIN
+		`r_user_agent_role`
+		AS r1 ON `t_user_third`.user_id =
+		r1.user_id
+		LEFT JOIN `t_agent` a1 ON r1.agent_id=a1.id
+		LEFT
+		JOIN `t_agent` a2 ON
+		a1.`parent_id`=a2.`id`
+		WHERE
+		t1.id=#{salesId};
+	</select>
+
+	<!-- 根据agentId查询员工详情信息 -->
+	<select id="getSalesDetailByAgentId" parameterType="Map"
+		resultMap="SalesDetailResultMap">
+		SELECT
+		t1.id AS sales_salesId,
+		t1.`user_name` AS
+		sales_userName,
+		t1.`password` AS sales_password,
+		t1.`nick_name` AS
+		sales_nickName,
+		t1.`real_name` as sales_realName,
+		t1.`gender` AS
+		sales_gender,
+		t1.`icon_url` AS sales_iconUrl,
+		t1.`mobile` AS
+		sales_mobile,
+		t1.`email` AS sales_email,
+		t1.`create_time` AS
+		sales_createTime,
+		t1.`login_time` AS sales_loginTime,
+		t1.`login_status`
+		AS sales_loginStatus,
+		t1.`descripe` AS sales_descripe,
+		r1.`agent_id`,
+		r1.`agent_name`,
+		r1.`role_id`,
+		r1.`role_name`,
+		r1.`sales_id`,
+		r1.`sales_name`,
+		r1.`referrer_id`,
+		r1.`referrer_name`,
+		t_user_third.`open_id`,
+		t_user_third.`register_type`,
+		a2.`agent_name` AS
+		parentAgent_name,
+		a2.`id` AS parentAgent_id
+
+
+		FROM
+		`t_user_third` LEFT JOIN
+		`t_user` AS t1 ON `t_user_third`.user_id = t1.id LEFT JOIN
+		`r_user_agent_role` AS r1 ON `t_user_third`.user_id =
+		r1.user_id
+		LEFT
+		JOIN `t_agent` a1 ON r1.agent_id=a1.id LEFT JOIN `t_agent` a2 ON
+		a1.`parent_id`=a2.`id`
+		WHERE a1.id=#{agentId} and r1.role_id=5
+	</select>
+
+	<!-- 根据salesId查询员工基本信息 -->
+	<select id="getSalesBaseInfoBySalesId" parameterType="Map"
+		resultMap="SalesBaseResultMap">
+		SELECT
+		t1.id AS sales_salesId,
+		t1.`user_name` AS
+		sales_userName,
+		r1.`agent_id`,
+		r1.`agent_name`,
+		a2.`agent_name` AS
+		parentAgent_name,
+		a2.`id` AS parentAgent_id
+
+		FROM
+		`t_user` AS t1 LEFT JOIN
+		`r_user_agent_role` AS r1 ON t1.id =
+		r1.user_id
+		LEFT JOIN `t_agent` a1
+		ON r1.agent_id=a1.id LEFT JOIN `t_agent` a2 ON
+		a1.`parent_id`=a2.`id`
+		WHERE t1.id=#{salesId};
+	</select>
+
+
+
+	<!-- 根据员工roleId,公司id，（员工姓名、编号模糊查询）查询员工详情信息 (包含所推广会员) -->
+	<select id="getSalesList" parameterType="Map" resultMap="SalesCountResultMap">
+		SELECT
+		t1.id ,
+		t1.`user_name`,
+		t1.`real_name` ,
+		t1.`icon_url` ,
+		t1.`mobile` ,
+		DATE_FORMAT(t1.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+		t1.`login_status` ,
+		a2.`agent_name` AS
+		parentAgent_name,
+		a2.`id` AS parentAgent_id,
+		r1.`agent_id`,
+		r1.`agent_name`,
+		(select count(*)
+		from r_user_agent_role where r_user_agent_role.sales_id=t1.id and r_user_agent_role.role_id=1) as
+		user_count
+		FROM
+		 `t_user`
+		AS t1  LEFT JOIN
+		`r_user_agent_role` AS
+		r1 ON
+		t1.id =
+		r1.user_id
+		LEFT JOIN `t_agent` a1 ON
+		r1.agent_id=a1.id
+		LEFT JOIN `t_agent` a2 ON
+		a1.`parent_id`=a2.`id`
+		<where>
+			<if test="roleId !=6 "> AND r1.role_id=#{roleId} </if>
+			<if test="roleId ==6 and agentId !=0"> AND r1.role_id=#{roleId} AND a1.id=#{agentId}</if>
+			<if test="roleId ==6 and agentId ==0"> AND r1.role_id=#{roleId}</if>
+			<if test="roleId !=6 and agentId !=0 "> AND a2.id=#{agentId}</if>
+			<if test="status !=100 "> AND t1.login_status=#{status}</if>
+			<if test="status ==100 "> AND t1.login_status!=2</if>
+			<if test="keyWord !=null and keyWord!='' "> AND (t1.`real_name` LIKE CONCAT('%',#{keyWord},'%')
+				or t1.id LIKE CONCAT('%',#{keyWord},'%') or a2.agent_name LIKE CONCAT('%',#{keyWord},'%')
+				or r1.agent_name LIKE CONCAT('%',#{keyWord},'%')
+				or t1.mobile LIKE CONCAT('%',#{keyWord},'%'))</if>
+		</where>
+	</select>
+	<!-- 根据员工roleId,门店id，（员工姓名、编号模糊查询）查询员工详情信息 (包含所推广会员) -->
+	<select id="getSalesAppList" parameterType="Map" resultMap="SalesCountResultMap">
+		SELECT
+		t1.id ,
+		t1.`real_name` ,
+		t1.`icon_url` ,
+		t1.`mobile` ,
+		t1.`create_time` ,
+		t1.`login_status` ,
+		'' AS
+		parentAgent_name,
+		a1.id AS parentAgent_id,
+		r1.`agent_id`,
+		r1.`agent_name`,
+		(select count(*)
+		from r_user_agent_role where r_user_agent_role.sales_id=t1.id and r_user_agent_role.role_id=1) as
+		user_count
+		FROM
+		`t_user`
+		AS t1  LEFT JOIN
+		`r_user_agent_role` AS
+		r1 ON
+		t1.id =
+		r1.user_id
+		LEFT JOIN `t_agent` a1 ON
+		r1.agent_id=a1.id
+		left join `t_agent` a2 on
+		a1.parent_id=a2.id
+		<where>
+			r1.role_id=#{roleId}
+			<if test="companyId!=0">
+				and a2.id=#{companyId}
+			</if>
+			<if test="agentId !=0 "> AND a1.id=#{agentId}</if>
+
+			<if test="keyWord !=null and keyWord!='' "> AND (t1.`real_name` LIKE CONCAT('%',#{keyWord},'%'))</if>
+			and t1.login_status=1
+		</where>
+	</select>
+	<select id="selectInviteNewByMobile" parameterType="string"
+		resultMap="InviteNewResultMap">
+		select
+		case
+		when count(u.id)>0 THEN
+		false
+		ELSE
+		true
+		end as newIs,
+		tu.nick_name as saleName,
+		ua.agent_name as saleAgentName,
+		u.mobile,
+		u.nick_name as nickName,
+		DATE_FORMAT(ua.create_time,'%Y-%m-%d
+		%H:%i:%s') as bindTime
+		from t_user u
+		left join r_user_agent_role ua
+		on
+		u.id=ua.user_id
+		LEFT JOIN t_user tu
+		on ua.sales_id=tu.id
+		where
+		u.mobile=#{moible}
+	</select>
+</mapper>

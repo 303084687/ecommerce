@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.tenant.orgi.RoleMapper">
+  <!-- 增加角色 -->
+  <insert id="addRole" parameterType="com.weichuang.ecommerce.tenant.entity.RoleEntity">
+    insert into t_role(name,role_key,description,status,create_time)values(#{name,jdbcType=VARCHAR},#{roleKey,jdbcType=VARCHAR},
+    #{description,jdbcType=VARCHAR},1,#{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <!-- 修改角色 -->
+  <update id="updateRole" parameterType="com.weichuang.ecommerce.tenant.entity.RoleEntity">
+    update t_role
+    <set>
+      <if test="roleKey !=null"> role_key=#{roleKey,jdbcType=VARCHAR},</if>
+      <if test="description !=null"> description=#{description,jdbcType=VARCHAR},</if>
+      <if test="status != null and status >0 "> status =#{status,jdbcType=INTEGER},</if>
+    </set>
+      where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!-- 角色列表 -->
+  <select id="getRoleList" resultType="com.weichuang.ecommerce.tenant.entity.RoleEntity">
+     select id,name,description,status,role_key as roleKey,create_time as createTime from t_role order by id desc
+  </select>
+  <!-- 查询角色详情 -->
+  <select id="findByRoleId" resultType="com.weichuang.ecommerce.tenant.entity.RoleEntity" parameterType="Map">
+     select id,name,description,status,role_key as roleKey,create_time as createTime from t_role where 1=1
+       <if test="roleName !=null and roleName !='' "> and name=#{roleName,jdbcType=VARCHAR}</if>
+       <if test="roleId != null and roleId >0 "> and id =#{roleId,jdbcType=INTEGER}</if>
+  </select>
+  <!-- 用户角色增加-->
+  <insert id="addAdminRole" parameterType="com.weichuang.ecommerce.tenant.entity.AdminRoleEntity">
+     insert into r_admin_role(admin_id,role_id)values(#{adminId,jdbcType=INTEGER},#{roleId,jdbcType=INTEGER}) 
+  </insert>
+  <!-- 用户角色修改(给用户修改角色) -->
+  <update id="updateAdminRole" parameterType="com.weichuang.ecommerce.tenant.entity.AdminRoleEntity">
+     update r_admin_role set role_id=#{roleId} where admin_id=#{adminId}
+  </update>
+  <!-- 用户角色删除(当删除用户时候要删除对应的角色) -->
+  <delete id="deleteAdminRole" parameterType="Map">
+     delete from r_admin_role where admin_id=#{adminId,jdbcType=INTEGER}
+  </delete>
+</mapper>

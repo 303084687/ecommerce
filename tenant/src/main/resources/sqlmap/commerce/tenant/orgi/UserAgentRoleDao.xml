@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.tenant.orgi.UserAgentRoleMapper">
+    <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.tenant.entity.UserAgentRoleEntity">
+        <id column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="agent_id" property="agentId" jdbcType="INTEGER"/>
+        <result column="agent_name" property="agentName" jdbcType="VARCHAR"/>
+        <result column="role_id" property="roleId" jdbcType="INTEGER"/>
+        <result column="role_name" property="roleName" jdbcType="VARCHAR"/>
+        <result column="sales_id" property="salesId" jdbcType="INTEGER"/>
+        <result column="sales_name" property="salesName" jdbcType="VARCHAR"/>
+        <result column="referrer_id" property="referrerId" jdbcType="INTEGER"/>
+        <result column="referrer_name" property="referrerName" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="operator" property="operator" jdbcType="INTEGER"/>
+        <result column="operator_name" property="operatorName" jdbcType="VARCHAR"/>
+        <result column="operate_time" property="operateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="UserCountResultMap" type="com.weichuang.ecommerce.tenant.entity.UserCountEntity">
+        <result column="all_count" property="allCount" jdbcType="INTEGER"/>
+        <result column="now_count" property="nowCount" jdbcType="INTEGER"/>
+        <result column="now_coupon_num" property="nowCouponNum" jdbcType="INTEGER"/>
+        <result column="all_coupon_num" property="allCouponNum" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="UserAgentRole_Column_List">
+        `user_id`,
+        `user_name`,
+        `agent_id`,
+        `agent_name`,
+        `role_id`,
+        `role_name`,
+        `sales_id`,
+        `sales_name`,
+        `referrer_id`,
+        `referrer_name`,
+        `create_time`,
+        `operator`,
+        `operator_name`,
+        `operate_time`
+    </sql>
+    <!-- 增加用户角色信息-->
+    <insert id="addUserAgentRole" parameterType="com.weichuang.ecommerce.tenant.entity.UserAgentRoleEntity" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO `r_user_agent_role`
+            (`user_id`,
+            `user_name`,
+            `agent_id`,
+            `agent_name`,
+            `role_id`,
+            `role_name`,
+            `sales_id`,
+            `sales_name`,
+            `referrer_id`,
+	        `referrer_name`,
+            `create_time`,
+            `operator`,
+            `operator_name`,
+            `operate_time`
+            )
+            VALUES
+            (#{userId,jdbcType=INTEGER},
+            #{userName,jdbcType=VARCHAR},
+            #{agentId,jdbcType=INTEGER},
+            #{agentName,jdbcType=VARCHAR},
+            #{roleId,jdbcType=INTEGER},
+            #{roleName,jdbcType=VARCHAR},
+            #{salesId,jdbcType=INTEGER},
+            #{salesName,jdbcType=VARCHAR},
+            #{referrerId,jdbcType=INTEGER},
+            #{referrerName,jdbcType=VARCHAR},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{operator,jdbcType=INTEGER},
+            #{operatorName,jdbcType=VARCHAR},
+            #{operateTime,jdbcType=TIMESTAMP}
+            )
+    </insert>
+    <select id="selectUserCountByUserId" parameterType="map" resultMap="UserCountResultMap">
+        select
+        (
+            select
+                count(*)
+            from
+                r_user_agent_role
+            where
+                1=1
+                <if test="type!=null and type==1">
+                    and sales_id=#{userId}
+                </if>
+                <if test="type!=null and type==2">
+                    and sales_id in( select sales_id from r_user_agent_role where agent_id=#{userId})
+                </if>
+
+        ) as all_count,
+        (
+            select
+                count(*)
+            from
+                r_user_agent_role
+            where
+             1=1
+            <if test="type!=null and type==1">
+                and sales_id=#{userId}
+            </if>
+            <if test="type!=null and type==2">
+                and sales_id in( select sales_id from r_user_agent_role where agent_id=#{userId})
+            </if>
+            and
+                DATE_FORMAT(create_time,'%Y-%m-%d')=DATE_FORMAT(now(),'%Y-%m-%d')
+        ) as now_count,
+        <if test="type!=null and type==1">
+            (
+            select count(*) from r_refer_recomme where refer_user_id=#{userId}
+            ) as all_coupon_num,
+            (
+            select count(*) from r_refer_recomme where refer_user_id=#{userId}   and
+            DATE_FORMAT(create_time,'%Y-%m-%d')=DATE_FORMAT(now(),'%Y-%m-%d')
+            ) as now_coupon_num
+        </if>
+        <if test="type!=null and type==2">
+            (
+            select count(*) from r_refer_recomme where refer_store_id=#{userId}
+            ) as all_coupon_num,
+            (
+            select count(*) from r_refer_recomme where refer_store_id=#{userId}   and
+            DATE_FORMAT(create_time,'%Y-%m-%d')=DATE_FORMAT(now(),'%Y-%m-%d')
+            ) as now_coupon_num
+        </if>
+    </select>
+    <!-- 根据用户名id查询用户对应的角色-->
+    <select id="getUserAgentRoleByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT 	<include refid="UserAgentRole_Column_List" />
+        FROM
+        `r_user_agent_role`
+        WHERE user_id=#{userId}
+    </select>
+    <!-- 根据代理商Id及角色查询相用户对应的角色-->
+    <select id="getUserAgentRoleByAgentIdAndRoleId" parameterType="Map" resultMap="BaseResultMap">
+        SELECT 	<include refid="UserAgentRole_Column_List" />
+        FROM
+        `r_user_agent_role`
+        WHERE agent_id=#{agentId} AND role_id=#{roleId}
+    </select>
+
+    <!-- 根据用户id更新业务人员的关系信息,更新角色及所在代理商-->
+    <update id="updateSalesAgentRoleByUserId" parameterType="Map">
+        UPDATE `r_user_agent_role`
+        SET
+            `agent_id` = #{agentId} ,
+            `agent_name` = #{agentName},
+            `role_id` = #{roleId},
+            `role_name` = #{roleName}
+        WHERE `user_id` = #{userId}
+    </update>
+    <!-- 根据用户id用户的关系信息,更新角色、业务人员及所在代理商-->
+    <update id="updateUserAgentRoleByUserId" parameterType="Map">
+        UPDATE `r_user_agent_role`
+        SET
+        `agent_id` = #{agentId},
+        `agent_name` = #{agentName},
+        `role_id` = #{roleId},
+        `role_name` = #{roleName},
+        `sales_id` =  #{salesId},
+	    `sales_name` =  #{salesName}
+        WHERE `user_id` = #{userId}
+    </update>
+    <!-- 根据用户id用户的关系信息,更新角色、推荐人信息、业务人员及所在代理商-->
+    <update id="updateReferrerAgentRoleByUserId" parameterType="Map">
+        UPDATE `r_user_agent_role`
+        SET
+        `agent_id` = #{agentId},
+        `agent_name` = #{agentName},
+        `role_id` = #{roleId},
+        `role_name` = #{roleName},
+        `sales_id` =  #{salesId},
+        `sales_name` =  #{salesName},
+        `referrer_id` = #{referrerId},
+	    `referrer_name` = #{referrerName}
+        WHERE `user_id` = #{userId}
+    </update>
+    <!--根据用户id修改收款人id-->
+    <update id="updateReceiverIdByUserId" parameterType="map">
+        UPDATE `r_user_agent_role`
+        SET
+        `receiver_accountid` = #{receiveraccountId}
+        WHERE `user_id` = #{userId}
+    </update>
+
+
+    <!--根据agentId修改agentName-->
+    <update id="updateAgentNameByAgentId" parameterType="map">
+        UPDATE `r_user_agent_role`
+        SET
+        `agent_name` = #{agentName}
+        WHERE `agent_id` = #{agentId}
+    </update>
+</mapper>

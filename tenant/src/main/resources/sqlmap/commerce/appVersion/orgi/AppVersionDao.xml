@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.appVersion.orgi.AppVersionMapper">
+  
+  <!-- 数据返回map -->
+  <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.appVersion.entity.AppVersionEntity" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="plat_form" property="platForm" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="version_code" property="versionCode" jdbcType="VARCHAR" />
+    <result column="version_name" property="versionName" jdbcType="VARCHAR" />
+    <result column="download" property="download" jdbcType="VARCHAR" />
+    <result column="size" property="size" jdbcType="INTEGER" />
+    <result column="force_update" property="forceUpdate" jdbcType="INTEGER" />
+    <result column="contents" property="contents" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <!-- 返回版本信息-->
+   <select id="getAppVersion" resultMap="BaseResultMap" parameterType="Map">
+      <![CDATA[select plat_form,version_code,version_name,download,size,force_update,contents from t_app_version where plat_form=#{platForm} and type=#{type} order by id desc limit 1 ]]>
+   </select>
+   
+   <!-- 后台版本管理列表数据 -->
+   <select id="getList" resultMap="BaseResultMap" parameterType="Map">
+    select id,type,plat_form,version_code,version_name,download,size,force_update,contents,create_time from t_app_version where 1=1
+      <if test="platForm !=null and platForm >0"> AND plat_form = #{platForm}</if>
+      order by id desc
+   </select>
+   
+   <!-- 增加版本更新 -->
+   <insert id="addAppVersion" parameterType="com.weichuang.ecommerce.appVersion.entity.AppVersionEntity">
+      <![CDATA[insert into t_app_version(plat_form,type,version_code,version_name,download,size,force_update,contents,create_time)values
+            (#{platForm},#{type},#{versionCode},#{versionName},#{download},#{size},#{forceUpdate},#{contents},now())]]>
+   </insert>
+   
+   <!-- 修改版本更新 -->
+   <update id="updateAppVersion" parameterType="com.weichuang.ecommerce.appVersion.entity.AppVersionEntity" >
+	    UPDATE t_app_version
+	    <set>
+		    <if test="versionCode != null and versionCode !='' " >version_code = #{versionCode,jdbcType=VARCHAR},</if>
+		    <if test="versionName != null and versionName !='' " > version_name= #{versionName,jdbcType=VARCHAR},</if>
+		    <if test="download != null and download !='' " > download= #{download,jdbcType=VARCHAR},</if>
+		    <if test="contents != null and contents !='' " > contents= #{contents,jdbcType=VARCHAR},</if>
+	        <if test="size != null and size >0" >size = #{size,jdbcType=INTEGER},</if>
+	        <if test="forceUpdate != null and forceUpdate >0" >force_update = #{forceUpdate,jdbcType=INTEGER},</if>
+	    </set>
+	     WHERE id = #{id,jdbcType=INTEGER}
+	  </update>
+   
+   <!-- 根据主键查询版本信息-->
+   <select id="getAppVersionById" resultMap="BaseResultMap" parameterType="Map">
+      <![CDATA[select id,type,plat_form,version_code,version_name,download,force_update,size,contents,create_time from t_app_version where id=#{id}]]>
+   </select>
+   
+</mapper>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.order.orgi.OrderRefundMapper">
+    <!-- 订单详情数据返回map -->
+    <resultMap type="com.weichuang.ecommerce.order.entity.OrderRefundEntity" id="BaseResultMap">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="refund_no" property="refundNo" jdbcType="VARCHAR"/>
+        <result column="refund_type" property="refundType" jdbcType="INTEGER"/>
+        <result column="refund_money" property="refundMoney" jdbcType="DECIMAL"/>
+        <result column="payment_type" property="paymentType" jdbcType="INTEGER"/>
+        <result column="payment_sequence" property="paymentSequence" jdbcType="VARCHAR"/>
+        <result column="payment_time" property="paymentTime" jdbcType="TIMESTAMP"/>
+        <result column="operator" property="operator" jdbcType="INTEGER"/>
+        <result column="operator_name" property="operatorName" jdbcType="TIMESTAMP"/>
+        <result column="operate_time" property="operateTime" jdbcType="TIMESTAMP"/>
+        <result column="refund_reason" property="refundReason" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <!-- 增加订单收货人信息-->
+    <insert id="addOrderRefund" parameterType="com.weichuang.ecommerce.order.entity.OrderRefundEntity"
+            useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `t_order_refund`
+		(
+		`order_id`,
+		`order_no`,
+		`refund_no`,
+		`refund_type`,
+		`refund_money`,
+		`payment_type`,
+		`payment_sequence`,
+		`payment_time`,
+		`operator`,
+		`operator_name`,
+		`operate_time`,
+		`status`,
+		`refund_reason`,
+		`create_time`
+		)
+		VALUES
+		(
+		#{orderId,jdbcType=INTEGER},
+		#{orderNo,jdbcType=VARCHAR},
+		#{refundNo,jdbcType=VARCHAR},
+		#{refundType,jdbcType=INTEGER},
+		#{refundMoney,jdbcType=DECIMAL},
+		#{paymentType,jdbcType=INTEGER},
+		#{paymentSequence,jdbcType=VARCHAR},
+		#{paymentTime,jdbcType=TIMESTAMP},
+		#{operator,jdbcType=INTEGER},
+		#{operatorName,jdbcType=VARCHAR},
+		#{operateTime,jdbcType=TIMESTAMP},
+		0,
+		#{refundReason,jdbcType=VARCHAR},
+		NOW()
+		)
+	</insert>
+    <sql id="Base_Column_List">
+		`id`,
+		`order_id`,
+		`order_no`,
+		`refund_no`,
+		`refund_type`,
+		`refund_money`,
+		`payment_type`,
+		`payment_sequence`,
+		`payment_time`,
+		`operator`,
+		`operator_name`,
+		`operate_time`,
+		`refund_reason`,
+		`create_time`
+	</sql>
+    <select id="getOrderRefundByOrderNo" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        `t_order_refund`
+        WHERE order_no = #{orderNo,jdbcType=VARCHAR}
+    </select>
+    <update id="updateOrderRefundStatusToClosedByOrderNo" parameterType="java.lang.String">
+		UPDATE `t_order_refund`
+		SET
+		`status` = 1
+		WHERE `order_no` = #{orderNo, jdbcType=VARCHAR}
+	</update>
+</mapper>

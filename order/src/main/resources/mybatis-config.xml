@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+       Copyright 2015-2016 the original author or authors.
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+-->
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!-- 配置sql语句显示 -->
+	<settings>
+		<setting name="logImpl" value="STDOUT_LOGGING" />
+	</settings>
+    <typeAliases>
+        <package name="com.weichuang.ecommerce.*.entity"/>
+    </typeAliases>
+    <mappers>
+        <!-- order start -->
+        <mapper resource="sqlmap/order/orgi/OrderDao.xml"/>
+        <mapper resource="sqlmap/order/orgi/OrderDetailDao.xml"/>
+        <mapper resource="sqlmap/order/orgi/OrderRecevierDao.xml"/>
+        <mapper resource="sqlmap/order/orgi/OrderSentDao.xml"/>
+        <mapper resource="sqlmap/order/orgi/OrderRefundDao.xml"/>
+        <mapper resource="sqlmap/order/orgi/SalesIncomeDao.xml"/>
+        <!-- order end -->
+        <!-- 商品开始 -->
+        <mapper resource="sqlmap/product/orgi/ProductDao.xml"/>
+        <mapper resource="sqlmap/product/orgi/ProductStockDao.xml"/>
+        <mapper resource="sqlmap/product/orgi/ProductClassifyDao.xml"/>
+        <!-- 商品结束 -->
+        <!-- 销售人员和代理商 -->
+         <mapper resource="sqlmap/withdraw/orgi/AgentIncomeDao.xml"/>
+         <mapper resource="sqlmap/withdraw/orgi/AgentWithdrawDao.xml"/>
+         <mapper resource="sqlmap/withdraw/orgi/SalesIncomeDao.xml"/>
+         <mapper resource="sqlmap/withdraw/orgi/SalesWithdrawDao.xml"/>
+         <mapper resource="sqlmap/withdraw/orgi/SalesWithdrawDetailDao.xml"/>
+         <mapper resource="sqlmap/withdraw/orgi/AgentWithdrawDetailDao.xml"/>
+         <mapper resource="sqlmap/withdraw/orgi/IncomeSetDao.xml"/>
+         
+        <!---代理商-->
+        <mapper resource="sqlmap/agent/orgi/AgentEntityDao.xml"/>
+        <!--二维码相关-->
+        <mapper resource="sqlmap/barcode/orgi/TenantCodeStoreDao.xml"/>
+        <mapper resource="sqlmap/barcode/orgi/SalesRedEnvelopActivitiDao.xml"/>
+        <mapper resource="sqlmap/barcode/orgi/SalesRedEnvelopeReceDao.xml"/>
+        <mapper resource="sqlmap/barcode/orgi/SalesPullNewSetDao.xml"/>
+        <mapper resource="sqlmap/barcode/orgi/SalesPullNewcDao.xml"/>
+        <mapper resource="sqlmap/barcode/orgi/SalesShareEnvelopeDao.xml"/>
+        <mapper resource="sqlmap/barcode/orgi/SalesShareEnvelopeSetDao.xml"/>
+        <mapper resource="sqlmap/barcode/orgi/SalesShareEnvelopeWithdrawDao.xml"/>
+        <mapper resource="sqlmap/barcode/orgi/SalesShareEnvelopeWithdrawDetailDao.xml"/>
+        <!--优惠券和类型-->
+        <mapper resource="sqlmap/coupon/orgi/CouponDao.xml"/>
+        <mapper resource="sqlmap/coupon/orgi/CouponTypeDao.xml"/>
+        <!--推荐者和被推荐者关系-->
+        <mapper resource="sqlmap/coupon/orgi/ReferRecommeDao.xml"/>
+        <mapper resource="sqlmap/order/orgi/OrderStatistics.xml"/>
+
+    </mappers>
+</configuration>

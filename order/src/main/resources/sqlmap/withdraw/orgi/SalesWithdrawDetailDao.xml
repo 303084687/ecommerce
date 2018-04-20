@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.order.orgi.SalesWithdrawDetailMapper">
+
+    <!-- 提现详情数据返回map -->
+    <resultMap type="com.weichuang.ecommerce.withdraw.entity.SalesWithdrawDetailEntity" id="BaseResultMap">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="withdraw_id" property="withdrawId" jdbcType="INTEGER"/>
+        <result column="income_id" property="incomeId" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="receive_money" property="receiveMoney" jdbcType="DECIMAL"/>
+        <result column="percent" property="percent" jdbcType="FLOAT"/>
+        <result column="income" property="income" jdbcType="DECIMAL"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <!--  增加-->
+    <insert id="addSalesWithdraw" parameterType="com.weichuang.ecommerce.withdraw.entity.SalesWithdrawDetailEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `ecommerce`.`t_sales_withdraw_detail`
+            (`withdraw_id`,
+            `income_id`,
+            `user_id`,
+            `user_name`,
+            `order_id`,
+            `order_no`,
+            `receive_money`,
+            `percent`,
+            `income`,
+            `create_time`
+            )
+            VALUES
+            (#{withdrawId,jdbcType=INTEGER},
+            #{incomeId,jdbcType=INTEGER},
+            #{userId,jdbcType=INTEGER},
+            #{userName,jdbcType=VARCHAR},
+            #{orderId,jdbcType=INTEGER},
+            #{orderNo,jdbcType=VARCHAR},
+            #{receiveMoney,jdbcType=DECIMAL},
+            #{percent,jdbcType=FLOAT},
+            #{income,jdbcType=DECIMAL},
+            #{createTime,jdbcType=TIMESTAMP}
+            )
+    </insert>
+    <!--  按withdrawid查询提现详情-->
+    <select id="getSalesWithdrawByWithdrawId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT 	`id`,
+        `withdraw_id`,
+        `income_id`,
+        `user_id`,
+        `user_name`,
+        `order_id`,
+        `order_no`,
+        `receive_money`,
+        `percent`,
+        `income`,
+        `create_time`
+        FROM
+        `ecommerce`.`t_sales_withdraw_detail`
+         WHERE withdraw_id = #{withdrawId,jdbcType=INTEGER}
+    </select>
+    
+    
+    
+     <select id="getSalesWithdrawDetailEntityListOfOriginal" resultMap="BaseResultMap" parameterType="map">
+        SELECT 	wi.`id` AS withdraw_id,
+        inc.`id` AS income_id,
+        inc.`user_id`,
+        inc.`user_name`,
+        inc.`order_id` ,
+        inc.`order_no` ,
+        inc.`receive_money`,
+        inc.`percent`,
+        inc.`income`,
+        inc.withdraw_time as create_time
+        FROM
+        `t_sales_income` AS inc LEFT JOIN `t_sales_withdraw` AS wi ON inc.`withdraw_time` = wi.`create_time`
+        WHERE inc.`sales_id`=#{saleId} <![CDATA[ AND inc.`withdraw_time` = #{systemTime}]]>
+    </select>
+    
+    
+</mapper>

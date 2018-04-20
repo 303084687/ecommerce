@@ -1,0 +1,98 @@
+server:
+  port: 8184
+
+#endpoints:
+#  redis:
+#    enabled: false
+
+spring:
+  profiles:
+    active: @profileActive@
+  application:
+    name: order
+  jackson:
+    serialization:
+      indent_output: true
+  cloud:
+    config:
+      profile: ${spring.profiles.active}
+#      uri: http://localhost:8888
+      enabled: true
+      discovery:
+        enabled: true
+        service-id: CONFIG
+  mail:
+    host: smtp.qiye.163.com
+    username: zhouhe@kokozu.net
+    password: 12!@#$Ab
+  properties:
+    mail:
+      smtp:
+       auth: true
+  jersey:
+      application-path: /api
+  jmx:
+    default-domain: ${spring.application.name}
+
+endpoints:
+  enabled: false
+  info:
+    enabled: true
+  health:
+    enabled: true
+  metrics:
+    enabled: true
+
+info:
+  app:
+    name: @project.artifactId@
+  build:
+    version: @project.version@
+
+#  boot:
+#    admin:
+#      url: http://localhost:8000
+#  output:
+#    ansi:
+#      enabled: DETECT
+# 自动配置属性
+# org.springframework.cloud.netflix.eureka.EurekaClientAutoConfiguration
+# org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 5  #心跳间隔
+    preferIpAddress: true
+    non-secure-port: ${server.port:8181}
+#    statusPageUrlPath: ${server.context-path}/info
+#    healthCheckUrlPath: ${server.context-path}/health
+#    homePageUrlPath: ${server.context-path}
+    metadata-map:
+      instanceId: ${spring.application.name}:${random.value}
+#      configPath: ${server.context-path}
+  client:
+#    healthcheck:
+#      enabled: true
+    registerWithEureka: true #注册本工程为服务
+    fetchRegistry: true
+    enabled: true
+    heartbeatExecutorThreadPoolSize: 10
+    cacheRefreshExecutorThreadPoolSize: 10
+    service-url:
+      defaultZone: http://${eureka.host}:${eureka.port}/eureka/
+  host: @eurekaHost@
+  port: @eurekaPort@
+
+WxPay:
+  #微信支付分配的商户号
+  mchId: 1490042752
+  #商户账号appid
+  appId: wx9b582f3ade1af770
+  #商户名称
+  sendName: xinyinong
+  #证书路径类似"/Users/Javen/Downloads/cert/apiclient_cert.p12"
+  certPath: d:/software/apiclient_cert.p12
+  #certPath: /opt/weixin/cert/apiclient_cert.p12
+  #商户平台设置的密钥key
+  paternerKey: ASD466SDJE221DSFREWLSA4565DFDGKG
+webchat:
+  h5NetworkUrl: http://p.jinjixiadan.com

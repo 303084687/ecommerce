@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 销售人员 -->
+<mapper namespace="sqlmap.withdraw.orgi.IncomeSetMapper">
+    <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.withdraw.entity.IncomeSetEntity">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="sales_percent" property="salesPercent" jdbcType="REAL"/>
+        <result column="agent_percent" property="agentPercent" jdbcType="REAL"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+
+    <!-- 查询所有提成设置(正常状态) -->
+    <select id="selectAllIncomeSet" parameterType="Map" resultMap="BaseResultMap">
+     select * from t_income_set WHERE status=1
+   </select>
+
+    <!-- 更新提成设置 -->
+    <update id="updateIncomeSet" parameterType="com.weichuang.ecommerce.withdraw.entity.IncomeSetEntity">
+        update t_income_set
+        <set>
+            <if test="salesPercent != null ">sales_percent = #{salesPercent},</if>
+            <if test="agentPercent != null">agent_percent= #{agentPercent},</if>
+        </set>
+        where id=#{id}
+    </update>
+    <!-- 增加提成设置 -->
+    <insert id="addIncomeSet" parameterType="com.weichuang.ecommerce.withdraw.entity.IncomeSetEntity">
+        INSERT INTO t_income_set (type,sales_percent,agent_percent) VALUES (#{type,jdbcType=INTEGER},#{salesPercent,jdbcType=REAL},#{agentPercent,jdbcType=REAL})
+    </insert>
+
+    <!--更改参数设置状态-->
+    <update id="updateIncomeSetStatus" parameterType="com.weichuang.ecommerce.withdraw.entity.IncomeSetEntity">
+        UPDATE  t_income_set
+        SET status=#{status}
+        WHERE id=#{id}
+
+    </update>
+
+
+</mapper>

@@ -1,0 +1,70 @@
+生成步骤
+1、执行生成命令
+
+java -jar swagger-codegen-cli-2.2.1.jar generate 
+-i http://localhost:8190/api/swagger.json 
+-l java 
+-c C:/Users/wgl/swagger/config_tenant.json 
+-o E:/ecommerce_tenant
+
+
+2、编辑pom.xml文件，做2处修改
+	a)增加nexus私有仓库配置
+	1：<build>处增加<finalName>tenant</finalName>
+	
+	
+	<repositories>
+        <repository>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>public</id>
+            <name>Public Repositories</name>
+            <url>http://192.168.1.225:8081/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>public</id>
+            <name>Public Repositories</name>
+            <url>http://192.168.1.225:8081/nexus/content/groups/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <distributionManagement>
+        <repository>
+            <id>Releases</id>
+            <name>Nexus Releases Repository</name>
+            <url>http://192.168.1.225:8081/nexus/content/groups/public/</url>
+        </repository>
+        <snapshotRepository>
+            <id>Snapshots</id>
+            <name>Nexus Snapshots Repository</name>
+            <url>http://192.168.1.225:8081/nexus/content/groups/public/</url>
+        </snapshotRepository>
+    </distributionManagement>
+	
+	b)jdk版本改为1.8
+3、导入开发工具（Eclipse、Idea）
+4、检查import的包
+5、增加类：TimestampTypeAdapter， JSON类里，实例化gson改为 放在com.zhidian.ecommerce.email.invoker
+	gson = new GsonBuilder()
+                .registerTypeAdapter(java.util.Date.class, new TimestampTypeAdapter())
+                .registerTypeHierarchyAdapter(Date.class, new JsonSerializer<Date>() {
+                    public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.ENGLISH);
+                        return new JsonPrimitive(format.format(src));
+                    }
+                }).setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
+6、运行单元测试
+7、打包：mvn clean package
+
+
+MAVEN引入本地jar包参考
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-java-client</artifactId>
+			<version>1.0.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/resources/lib/swagger-java-client-1.0.0.jar</systemPath>
+		</dependency>

@@ -1,0 +1,1020 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.tenant.orgi.AgentMapper">
+
+	<!--代理基础信息 -->
+	<resultMap id="BaseResultMap"
+		type="com.weichuang.ecommerce.tenant.entity.AgentEntity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="agent_code" property="agentCode" jdbcType="VARCHAR" />
+		<result column="parent_id" property="parentId" jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="corporation" property="corporation" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="operator" property="operator" jdbcType="INTEGER" />
+		<result column="operator_name" property="operatorName"
+			jdbcType="VARCHAR" />
+		<result column="operate_time" property="operateTime" jdbcType="TIMESTAMP" />
+		<result column="barcode_url" property="barcodeUrl" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!--公司基本信息（只包括公司id和公司名称） -->
+	<resultMap id="ParentAgentBaseResultMap"
+		type="com.weichuang.ecommerce.tenant.entity.ParentAgentBaseEntity">
+		<id column="id" property="parentAgentId" jdbcType="INTEGER" />
+		<result column="agent_name" property="parentAgentName" jdbcType="VARCHAR" />
+		
+	</resultMap>
+	<!--公司列表-->
+	<resultMap id="AgentCouponResultMap" type="com.weichuang.ecommerce.tenant.entity.AgentCouponEntity">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+		<result column="person_num" property="personNum" jdbcType="INTEGER" />
+		<result column="agent_code" property="agentCode" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+	</resultMap>
+	<!--公司信息 -->
+	<resultMap id="ParentAgentMap"
+		type="com.weichuang.ecommerce.tenant.entity.ParentAgentEntity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="parentAgent_agentName" property="agentName"
+			jdbcType="VARCHAR" />
+		<result column="parentAgent_address" property="address"
+			jdbcType="VARCHAR" />
+		<result column="parentAgent_agentCode" property="agentCode"
+			jdbcType="VARCHAR" />
+		<result column="parentAgent_parentId" property="parentId"
+			jdbcType="INTEGER" />
+		<result column="parentAgent_status" property="status" jdbcType="INTEGER" />
+		<result column="parentAgent_corporation" property="corporation"
+			jdbcType="VARCHAR" />
+		<result column="parentAgent_createTime" property="createTime"
+			jdbcType="TIMESTAMP" />
+		<result column="parentAgent_operator" property="operator"
+			jdbcType="INTEGER" />
+		<result column="parentAgent_operatorName" property="operatorName"
+			jdbcType="VARCHAR" />
+		<result column="parentAgent_operateTime" property="operateTime"
+			jdbcType="TIMESTAMP" />
+		<result column="parentAgent_barcodeUrl" property="barcodeUrl"
+			jdbcType="VARCHAR" />
+		<collection property="agentList"
+			ofType="com.weichuang.ecommerce.tenant.entity.AgentEntity">
+			<id column="agent_id" property="id" jdbcType="INTEGER" />
+			<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+			<result column="address" property="address" jdbcType="VARCHAR" />
+			<result column="agent_code" property="agentCode" jdbcType="VARCHAR" />
+			<result column="parent_id" property="parentId" jdbcType="INTEGER" />
+			<result column="status" property="status" jdbcType="INTEGER" />
+			<result column="corporation" property="corporation" jdbcType="VARCHAR" />
+			<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+			<result column="operator" property="operator" jdbcType="INTEGER" />
+			<result column="operator_name" property="operatorName"
+				jdbcType="VARCHAR" />
+			<result column="operate_time" property="operateTime" jdbcType="TIMESTAMP" />
+
+		</collection>
+
+
+	</resultMap>
+	
+	<!--公司信息(含店面数量) -->
+	<resultMap id="ParentAgentCountMap"
+		type="com.weichuang.ecommerce.tenant.entity.ParentAgentEntity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName"
+			jdbcType="VARCHAR" />
+		<result column="agent_address" property="address"
+			jdbcType="VARCHAR" />
+		<result column="agent_code" property="agentCode"
+			jdbcType="VARCHAR" />
+		<result column="parent_id" property="parentId"
+			jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="corporation" property="corporation"
+			jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime"
+			jdbcType="TIMESTAMP" />
+		<result column="operator" property="operator"
+			jdbcType="INTEGER" />
+		<result column="operator_name" property="operatorName"
+			jdbcType="VARCHAR" />
+		<result column="operate_time" property="operateTime"
+			jdbcType="TIMESTAMP" />
+		<result column="barcode_url" property="barcodeUrl"
+			jdbcType="VARCHAR" />
+			<result column="agent_count" property="agentCount"
+			jdbcType="VARCHAR" />
+		
+
+
+	</resultMap>
+
+
+	<!--公司信息(包含员工信息) -->
+	<resultMap id="ParentAgentChildAgentSalesMap"
+		type="com.weichuang.ecommerce.tenant.entity.ParentAgentChildAgentSalesEntity">
+		<id column="parentAgent_id" property="id" jdbcType="INTEGER" />
+		<result column="parentAgent_agentName" property="agentName"
+			jdbcType="VARCHAR" />
+		<result column="parentAgent_address" property="address"
+			jdbcType="VARCHAR" />
+		<result column="parentAgent_agentCode" property="agentCode"
+			jdbcType="VARCHAR" />
+		<result column="parentAgent_parentId" property="parentId"
+			jdbcType="INTEGER" />
+		<result column="parentAgent_status" property="status" jdbcType="INTEGER" />
+		<result column="parentAgent_corporation" property="corporation"
+			jdbcType="VARCHAR" />
+		<result column="parentAgent_createTime" property="createTime"
+			jdbcType="TIMESTAMP" />
+		<result column="parentAgent_operator" property="operator"
+			jdbcType="INTEGER" />
+		<result column="parentAgent_operatorName" property="operatorName"
+			jdbcType="VARCHAR" />
+		<result column="parentAgent_operateTime" property="operateTime"
+			jdbcType="TIMESTAMP" />
+		<collection property="childAgentList"
+			ofType="com.weichuang.ecommerce.tenant.entity.ChildAgentEntity">
+			<id column="id" property="id" jdbcType="INTEGER" />
+			<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+			<result column="address" property="address" jdbcType="VARCHAR" />
+			<result column="agent_code" property="agentCode" jdbcType="VARCHAR" />
+			<result column="parent_id" property="parentId" jdbcType="INTEGER" />
+			<result column="status" property="status" jdbcType="INTEGER" />
+			<result column="corporation" property="corporation" jdbcType="VARCHAR" />
+			<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+			<result column="operator" property="operator" jdbcType="INTEGER" />
+			<result column="operator_name" property="operatorName"
+				jdbcType="VARCHAR" />
+			<result column="operate_time" property="operateTime" jdbcType="TIMESTAMP" />
+			<collection property="userList"
+				ofType="com.weichuang.ecommerce.tenant.entity.UserEntity">
+				<id column="id" property="id" jdbcType="INTEGER" />
+				<result column="user_name" property="userName" jdbcType="VARCHAR" />
+				<result column="password" property="password" jdbcType="VARCHAR" />
+				<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+				<result column="real_name" property="realName" jdbcType="VARCHAR" />
+				<result column="gender" property="gender" jdbcType="INTEGER" />
+				<result column="icon_url" property="iconUrl" jdbcType="VARCHAR" />
+				<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+				<result column="email" property="email" jdbcType="VARCHAR" />
+				<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+				<result column="login_time" property="loginTime" jdbcType="TIMESTAMP" />
+				<result column="is_subscribe" property="isSubscribe"
+					jdbcType="INTEGER" />
+				<result column="login_status" property="loginStatus"
+					jdbcType="INTEGER" />
+			</collection>
+
+		</collection>
+
+
+	</resultMap>
+
+
+
+
+
+	<!--店面信息 -->
+	<resultMap id="ChildAgentMap"
+		type="com.weichuang.ecommerce.tenant.entity.ChildAgentEntity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="agent_code" property="agentCode" jdbcType="VARCHAR" />
+		<result column="parent_id" property="parentId" jdbcType="INTEGER" />
+		<result column="parent_name" property="parentName" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="corporation" property="corporation" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="operator" property="operator" jdbcType="INTEGER" />
+		<result column="operator_name" property="operatorName"
+			jdbcType="VARCHAR" />
+		<result column="operate_time" property="operateTime" jdbcType="TIMESTAMP" />
+		<result column="barcode_url" property="barcodeUrl" jdbcType="VARCHAR" />
+		<collection property="userList"
+			ofType="com.weichuang.ecommerce.tenant.entity.UserEntity">
+			<id column="id" property="id" jdbcType="INTEGER" />
+			<result column="user_name" property="userName" jdbcType="VARCHAR" />
+			<result column="password" property="password" jdbcType="VARCHAR" />
+			<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+			<result column="real_name" property="realName" jdbcType="VARCHAR" />
+			<result column="gender" property="gender" jdbcType="INTEGER" />
+			<result column="icon_url" property="iconUrl" jdbcType="VARCHAR" />
+			<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+			<result column="email" property="email" jdbcType="VARCHAR" />
+			<result column="sales_create_time" property="createTime" jdbcType="TIMESTAMP" />
+			<result column="login_time" property="loginTime" jdbcType="TIMESTAMP" />
+			<result column="is_subscribe" property="isSubscribe" jdbcType="INTEGER" />
+			<result column="login_status" property="loginStatus" jdbcType="INTEGER" />
+		</collection>
+	</resultMap>
+
+
+	<!--店面信息(含员工数量不含员工详细信息) -->
+	<resultMap id="ChildAgentSalesCountMap"
+		type="com.weichuang.ecommerce.tenant.entity.ChildAgentEntity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="agent_code" property="agentCode" jdbcType="VARCHAR" />
+		<result column="parent_id" property="parentId" jdbcType="INTEGER" />
+		<result column="parent_name" property="parentName" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="corporation" property="corporation" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="operator" property="operator" jdbcType="INTEGER" />
+		<result column="operator_name" property="operatorName"
+			jdbcType="VARCHAR" />
+		<result column="operate_time" property="operateTime" jdbcType="TIMESTAMP" />
+		<result column="barcode_url" property="barcodeUrl" jdbcType="VARCHAR" />
+		<result column="sales_count" property="salesCount" jdbcType="INTEGER" />
+	</resultMap>
+	<resultMap id="MyShopResultMap" type="com.weichuang.ecommerce.tenant.entity.MyShopEntity">
+		<result column="agent_id" property="agentId" jdbcType="INTEGER" />
+		<result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+		<result column="parent_id" property="parentId" jdbcType="INTEGER" />
+		<result column="member_num" property="memberNum" jdbcType="INTEGER" />
+	</resultMap>
+
+	<!-- 增加代理 -->
+	<insert id="addAgent" parameterType="com.weichuang.ecommerce.tenant.entity.AgentEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `ecommerce`.`t_agent`
+		(`agent_name`,
+		`address`,
+		`agent_code`,
+		`parent_id`,
+		`corporation`,
+		`operator`,
+		`operator_name`
+
+		)
+		VALUES
+		(#{agentName,jdbcType=VARCHAR},
+		#{address,jdbcType=VARCHAR},
+		#{agentCode,jdbcType=VARCHAR},
+		#{parentId,jdbcType=VARCHAR},
+		#{corporation,jdbcType=VARCHAR},
+		#{operator,jdbcType=VARCHAR},
+		#{operatorName,jdbcType=VARCHAR}
+		)
+	</insert>
+
+
+
+
+	<select id="getAgentById" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		SELECT `id`,
+		`agent_name`,
+		`address`,
+		`agent_code`,
+		`status`,
+		`parent_id`,
+		`create_time`,
+		`operator`,
+		`operator_name`,
+		`operate_time`,
+		`barcode_url`
+		FROM
+		`t_agent`
+		WHERE id=#{agentId}
+	</select>
+	<select id="getAgentList" parameterType="map" resultMap="BaseResultMap">
+		SELECT `id`,
+		`agent_name`,
+		`address`,
+		`agent_code`,
+		`parent_id`,
+		`status`,
+		`create_time`,
+		`operator`,
+		`operator_name`,
+		`operate_time`,
+		`barcode_url`
+		FROM
+		`t_agent`
+		WHERE 1=1
+		<if test="parentId!=null">
+			and parent_id=#{parentId}
+		</if>
+		<if test="agentName!=null and agentName!=''">
+			and agent_name like concat('%',#{agentName},'%')
+		</if>
+		ORDER BY
+		CONVERT(`agent_name` USING gbk)
+	</select>
+
+
+	<!-- 编辑代理 -->
+	<update id="updateAgent" parameterType="com.weichuang.ecommerce.tenant.entity.AgentEntity">
+		UPDATE `ecommerce`.`t_agent`
+		<set>
+
+
+			<if test="agentName!=null and agentName!=''">`agent_name`=#{agentName,jdbcType=VARCHAR},
+			</if>
+			<if test="address!=null and address!=''">`address`=#{address,jdbcType=VARCHAR},</if>
+			<if test="corporation!=null and corporation!=''">`corporation`=#{corporation,jdbcType=VARCHAR},</if>
+
+			<if test="operator!=null and operator!=''">`operator`=#{operator,jdbcType=INTEGER},</if>
+			<if test="operatorName!=null and operatorName!=''">`operator_name`=#{operatorName,jdbcType=VARCHAR},</if>
+			<if test="operateTime==null">`operate_time`=(select now()),</if>
+		</set>
+		WHERE id=#{id}
+	</update>
+
+	<!--  显示公司列表 
+	<select id="getParentAgentList" parameterType="Map" resultMap="ParentAgentMap">
+		SELECT
+		parentAgent.id AS id,
+		parentAgent.agent_name AS
+		parentAgent_agentName,
+		parentAgent.address AS parentAgent_address,
+		parentAgent.agent_code AS parentAgent_agentCode,
+		parentAgent.parent_id AS
+		parentAgent_parentId,
+		parentAgent.status AS parentAgent_status,
+		parentAgent.corporation
+		AS
+		parentAgent_corporation,
+		parentAgent.create_time AS
+		parentAgent_createTime,
+		parentAgent.operator
+		AS parentAgent_operator,
+		parentAgent.operator_name AS
+		parentAgent_operatorName,
+		parentAgent.operate_time AS
+		parentAgent_operateTime,
+		parentAgent.barcode_url AS
+		parentAgent_barcodeUrl,
+		agent.`id` as agent_id,
+		agent.`agent_name`,
+		agent.`address`,
+		agent.`agent_code`,
+		agent.`parent_id`,
+		agent.`status`,
+		agent.`corporation`,
+		agent.`create_time`,
+		agent.`operator`,
+		agent.`operator_name`,
+		agent.`operate_time`
+		FROM
+		`t_agent` AS parentAgent
+		LEFT JOIN `t_agent` AS
+		agent ON parentAgent.`id`=agent.`parent_id`
+
+		<where>
+			parentAgent.`parent_id`=0
+
+			<if test="status !=null and status !='' "> AND parentAgent.`status`=#{status}</if>
+			<if test="keyWord !=null and keyWord!='' "> AND (parentAgent.`corporation` LIKE
+				CONCAT('%',#{keyWord},'%') or parentAgent.`agent_name` LIKE
+				CONCAT('%',#{keyWord},'%'))</if>
+		</where>
+	</select> -->
+	
+	<!-- 显示公司列表(含店面数量) -->
+	<select id="getParentAgentList" parameterType="Map" resultMap="ParentAgentCountMap">
+		SELECT
+		agent.`id`,
+		agent.`agent_name`,
+		agent.`address`,
+		agent.`agent_code`,
+		agent.`parent_id`,
+		
+		agent.`status`,
+		agent.`corporation`,
+		agent.`create_time`,
+		agent.`operator`,
+		agent.`operator_name`,
+		agent.`operate_time`,
+		agent.`barcode_url`,
+		(SELECT COUNT(*) FROM t_agent  WHERE t_agent.`parent_id`=agent.`id`) AS agent_count
+
+		FROM
+		`t_agent` AS agent
+		 
+
+		<where>
+			agent.`parent_id`=0
+
+			<if test="status !=100 "> AND agent.`status`=#{status}</if>
+			<if test="status ==100 "> AND agent.`status`!=2</if>
+			<if test="keyWord !=null and keyWord!='' "> AND (agent.`corporation` LIKE
+				CONCAT('%',#{keyWord},'%') or agent.`agent_name` LIKE
+				CONCAT('%',#{keyWord},'%') or agent.`id` LIKE
+				CONCAT('%',#{keyWord},'%'))</if>
+		</where>
+	</select>
+	
+	
+
+	<!-- 根据状态显示公司列表(只包含公司id和公司名称) -->
+	<select id="getParentAgentBaseList" parameterType="Map" resultMap="ParentAgentBaseResultMap">
+		SELECT
+		`id`,
+		`agent_name`
+		FROM t_agent
+		<where>
+			`parent_id`=0
+
+			<if test="status !=null and status !='' "> AND `status`=#{status}</if>
+			
+		</where>
+	</select>
+
+	<!-- 显示公司列表(含店面信息，员工信息) -->
+	<select id="getParentAgentChildAgentSalesList" parameterType="Map"
+		resultMap="ParentAgentMap">
+		SELECT
+		parentAgent.id AS id,
+		parentAgent.agent_name AS
+		parentAgent_agentName,
+		parentAgent.address AS
+		parentAgent_address,
+		parentAgent.agent_code AS agentCode,
+		parentAgent.parent_id AS
+		parentAgent_parentId,
+		parentAgent.status AS
+		parentAgent_status,
+		parentAgent.corporation
+		AS
+		parentAgent_corporation,
+		parentAgent.create_time AS
+		parentAgent_createTime,
+		parentAgent.operator
+		AS parentAgent_operator,
+		parentAgent.operator_name AS
+		parentAgent_operatorName,
+		parentAgent.operate_time AS
+		parentAgent_operateTime,
+
+		agent.`id` as agent_id,
+		agent.`agent_name`,
+		agent.`address`,
+		agent.`agent_code`,
+		agent.`parent_id`,
+		agent.`status`,
+		agent.`corporation`,
+		agent.`create_time`,
+		agent.`operator`,
+		agent.`operator_name`,
+		agent.`operate_time`,
+
+		t_user.`id`,
+		t_user.`user_name`,
+		t_user.`password`,
+		t_user.`nick_name`,
+		t_user.`login_status`,
+		t_user.`real_name`,
+		t_user.`gender`,
+		t_user.`icon_url`,
+		t_user.`mobile`,
+		t_user.`email`,
+		t_user.`create_time`,
+		t_user.`login_time`,
+		t_user.`login_status`
+		FROM
+		`t_agent`
+		AS parentAgent
+		LEFT
+		JOIN `t_agent` AS
+		agent ON
+		parentAgent.`id`=agent.`parent_id`
+		LEFT JOIN
+		`r_user_agent_role` role ON
+		agent.`id` =
+		role.`agent_id`
+		LEFT JOIN
+
+
+		`t_user`
+		ON
+		role.`user_id`=`t_user`.id
+		WHERE parentAgent.`parent_id`=0
+		AND
+		`t_user`.`login_status`=1
+
+
+	</select>
+
+
+	<!-- 根据id更新公司合作状态 -->
+	<update id="updateAgentStatusByAgentId" parameterType="Map">
+		update
+		`t_agent`
+		set
+		`operator`=#{operator},
+		`operator_name`=#{operatorName},
+		`operate_time`=(select now()),
+		`status`=#{status}
+		where
+		`id`=#{agentId}
+	</update>
+	
+
+<!-- 根据parentAgentId更新公司合作状态 -->
+	<update id="updateAgentStatusByParentAgentId" parameterType="Map">
+		update
+		`t_agent`
+		set
+		`operator`=#{operator},
+		`operator_name`=#{operatorName},
+		`operate_time`=(select now()),
+		`status`=#{status}
+		where
+		`parent_id`=#{parentAgentId}
+	</update>
+	<!-- 根据id更新二维码 -->
+	<update id="updateBarcodeurl" parameterType="Map">
+		update
+		`t_agent`
+		set
+		`barcode_url`=#{barcodeUrl}
+		where
+		`id`=#{agentId}
+	</update>
+
+
+
+
+	<!-- 根据公司id获取公司基本资料 -->
+
+	<select id="getAgentInfoByAgentId" parameterType="Map"
+		resultMap="BaseResultMap">
+		SELECT
+		t1.`id`,
+		t1.`agent_name`,
+		t1.`address`,
+		t1.`agent_code`,
+		t1.`parent_id`,
+		t1.`status`,
+		t1.`corporation`,
+		t1.`create_time`,
+		t1.`operator`,
+		t1.`operator_name`,
+		t1.`operate_time`,
+		t1.`barcode_url`
+		FROM
+		`t_agent` t1
+		WHERE t1.`id`=#{agentId}
+	</select>
+
+
+
+	<!-- 根据公司code获取公司基本资料 -->
+
+	<select id="getAgentInfoByAgentCode" parameterType="Map"
+		resultMap="BaseResultMap">
+		SELECT
+		t1.`id`,
+		t1.`agent_name`,
+		t1.`address`,
+		t1.`agent_code`,
+		t1.`parent_id`,
+		t1.`status`,
+		t1.`corporation`,
+		t1.`create_time`,
+		t1.`operator`,
+		t1.`operator_name`,
+		t1.`operate_time`,
+		t1.`barcode_url`
+		FROM
+		`t_agent` t1
+		WHERE t1.`agent_code`=#{agentCode}
+	</select>
+
+	<!-- 根据公司名称获取公司基本资料 -->
+
+	<select id="getAgentInfoByAgentName" parameterType="Map"
+		resultMap="BaseResultMap">
+		SELECT
+		`id`,
+		`agent_name`,
+		`address`,
+		`agent_code`,
+		`parent_id`,
+		`status`,
+		`corporation`,
+		`create_time`,
+		`operator`,
+		`operator_name`,
+		`operate_time`,
+		`barcode_url`
+		FROM
+		`t_agent`
+		WHERE agent_name=#{agentName}
+	</select>
+
+	<!-- 根据公司id获取公司员工数量 -->
+
+	<select id="getSalseCountByParentAgentId" parameterType="Map"
+		resultType="Integer">
+		SELECT COUNT(u.id)
+		FROM t_user AS u
+		LEFT JOIN
+		r_user_agent_role AS r
+		ON
+		u.`id`=r.`user_id`
+		LEFT JOIN t_agent AS a
+		ON
+		r.`agent_id`=a.`id`
+		WHERE r.`role_id`=5 AND
+		a.`parent_id`=#{parentAgentId};
+	</select>
+	<!--门店及会员信息-->
+	<select id="getShopListByAgentId" parameterType="int" resultMap="MyShopResultMap">
+		select
+		tat.id as agent_id,
+		tat.agent_name,
+		tat.parent_id,
+		(select count(*) from r_user_agent_role rar left join t_user u on rar.user_id=u.id where agent_id=tat.id and role_id=5 and  u.login_status=1 ) as member_num
+		from
+		t_agent tat
+		where tat.parent_id=#{parentId} and tat.status!=2
+		order by
+		convert(tat.`agent_name` USING gbk)
+	</select>
+	
+	<!-- 根据公司id获取公司会员数量 -->
+
+	<select id="getUserCountByParentAgentId" parameterType="Map"
+		resultType="Integer">
+		SELECT COUNT(u.id)
+		FROM t_user AS u
+		LEFT JOIN
+		r_user_agent_role AS r
+		ON
+		u.`id`=r.`user_id`
+		LEFT JOIN t_agent AS a
+		ON
+		r.`agent_id`=a.`id`
+		
+		WHERE 
+		a.`parent_id`=#{parentAgentId};
+	</select>
+	
+	<!-- 根据门店id获取门店会员数量 -->
+	<select id="getUserCountByAgentId" parameterType="Map"
+		resultType="Integer">
+		SELECT COUNT(u.id)
+		FROM t_user AS u
+		LEFT JOIN
+		r_user_agent_role AS r
+		ON
+		u.`id`=r.`user_id`
+		WHERE 
+		r.`agent_id`=#{agentId};
+		
+	</select>
+	
+	
+
+	<!-- 根据公司id获取公司员工数量 -->
+
+	<select id="getSalseCountTodayByParentAgentId" parameterType="Map"
+		resultType="Integer">
+		SELECT COUNT(u.id)
+		FROM t_user AS u
+		LEFT JOIN
+		r_user_agent_role AS r
+		ON
+		u.`id`=r.`user_id`
+		LEFT JOIN t_agent AS a
+		ON
+		r.`agent_id`=a.`id`
+		LEFT
+		JOIN t_agent AS a2
+		ON a.`id`=a2.`parent_id`
+		WHERE r.`role_id`=5 AND
+		a.`parent_id`=#{parentAgentId}
+		AND u.creat_time
+		like CONCAT('%',#{date},'%');
+	</select>
+
+	<!-- 显示店面列表 -->
+	<select id="getChildAgentInfoList" parameterType="Map"
+		resultMap="ChildAgentMap">
+		SELECT
+		agent.`id`,
+		agent.`agent_name`,
+		agent.`address`,
+		agent.`agent_code`,
+		agent.`parent_id`,
+		agent2.`agent_name` AS
+		parent_name,
+		agent.`status`,
+		agent.`corporation`,
+		agent.`create_time`,
+		agent.`operator`,
+		agent.`operator_name`,
+		agent.`operate_time`,
+		agent.`barcode_url`,
+
+		t_user.`id`,
+		t_user.`user_name`,
+		t_user.`password`,
+		t_user.`nick_name`,
+		t_user.`real_name`,
+		t_user.`gender`,
+		t_user.`icon_url`,
+		t_user.`mobile`,
+		t_user.`email`,
+		t_user.`create_time`,
+		t_user.`login_time`,
+		t_user.`login_status`
+		FROM
+		`t_agent` AS agent
+		LEFT JOIN
+		`t_agent` AS agent2 ON
+		agent.`parent_id`=agent2.`id`
+		LEFT JOIN
+		`r_user_agent_role` ON agent.id
+		=
+		`r_user_agent_role`.agent_id
+		LEFT JOIN
+		`t_user`
+		ON
+		`r_user_agent_role`.user_id=`t_user`.id
+
+		<where>
+
+			`r_user_agent_role`.`role_id`=5
+			<if test="status !=null and status!=''"> AND agent.`status`=#{status}</if>
+			<if test="parentId !=0 "> AND agent.`parent_id`=#{parentId}</if>
+			<if test="parentId ==0 "> AND agent.`parent_id` >0</if>
+			<if test="keyWord !=null and keyWord!='' "> AND (agent.`agent_name` LIKE
+				CONCAT('%',#{keyWord},'%')
+				or agent.`agent_code` LIKE
+				CONCAT('%',#{keyWord},'%'))</if>
+		</where>
+	</select>
+
+	<!-- 显示店面列表(含员工数量不含员工详细信息) -->
+	<select id="getChildAgentSalesCountInfoList" parameterType="Map"
+		resultMap="ChildAgentSalesCountMap">
+		SELECT
+		agent.`id`,
+		agent.`agent_name`,
+		agent.`address`,
+		agent.`agent_code`,
+		agent.`parent_id`,
+		agent2.`agent_name` AS
+		parent_name,
+		agent.`status`,
+		agent.`corporation`,
+		DATE_FORMAT(agent.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+		agent.`operator`,
+		agent.`operator_name`,
+		agent.`operate_time`,
+		agent.`barcode_url`,
+		(SELECT COUNT(*) FROM `r_user_agent_role` WHERE
+		r_user_agent_role.`agent_id` = agent.`id` AND
+		r_user_agent_role.`role_id`=5) AS sales_count
+
+		FROM
+		`t_agent` AS agent
+		LEFT JOIN
+		`t_agent` AS agent2 ON
+		agent.`parent_id`=agent2.`id`
+		<where>
+			<!-- agent.`parent_id`=#{agentId} -->
+
+			<if test="status !=100 "> AND agent.`status`=#{status}</if>
+			<if test="status ==100 "> AND agent.`status`!=2</if>
+			<if test="agentId !=0 "> AND agent.`parent_id`=#{agentId}</if>
+			<if test="agentId ==0 "> AND agent.`parent_id` >0 </if>
+
+			<if test="keyWord !=null and keyWord!='' "> AND (agent.`agent_name` LIKE
+				CONCAT('%',#{keyWord},'%')
+				or
+				agent.`id` LIKE
+				CONCAT('%',#{keyWord},'%'))</if>
+		</where>
+	</select>
+
+	<!-- 显示店面列表(含员工数量不含员工详细信息) -->
+	<select id="getChildAgentSalesCountInfoByChildAgentId"
+		parameterType="Map" resultMap="ChildAgentSalesCountMap">
+		SELECT
+		agent.`id`,
+		agent.`agent_name`,
+		agent.`address`,
+		agent.`agent_code`,
+		agent.`parent_id`,
+		agent2.`agent_name` AS
+		parent_name,
+		agent.`status`,
+		agent.`corporation`,
+		DATE_FORMAT(agent.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+		agent.`operator`,
+		agent.`operator_name`,
+		agent.`operate_time`,
+		agent.`barcode_url`,
+		(SELECT COUNT(*) FROM
+		`r_user_agent_role` WHERE r_user_agent_role.`agent_id` = agent.`id`
+		AND r_user_agent_role.`role_id`=5) AS sales_count
+
+		FROM
+		`t_agent` AS
+		agent
+		LEFT JOIN
+		`t_agent` AS agent2 ON
+		agent.`parent_id`=agent2.`id`
+		WHERE agent.`id`=#{childAgentId}
+
+
+	</select>
+
+	<!-- 根据id查询公司 -->
+	<select id="getParentAgentInfoByParentAgentId" parameterType="Map"
+		resultMap="ParentAgentMap">
+		SELECT
+		parentAgent.id AS id,
+		parentAgent.agent_name AS
+		parentAgent_agentName,
+		parentAgent.address AS
+		parentAgent_address,
+		parentAgent.agent_code AS agentCode,
+		parentAgent.parent_id AS
+		parentAgent_parentId,
+		parentAgent.status AS
+		parentAgent_status,
+		parentAgent.corporation
+		AS
+		parentAgent_corporation,
+		parentAgent.create_time AS
+		parentAgent_createTime,
+		parentAgent.operator
+		AS parentAgent_operator,
+		parentAgent.operator_name AS
+		parentAgent_operatorName,
+		parentAgent.operate_time AS
+		parentAgent_operateTime,
+		parentAgent.barcode_url AS
+		parentAgent_barcodeUrl,
+		agent.`id` as agent_id,
+		agent.`agent_name`,
+		agent.`address`,
+		agent.`agent_code`,
+		agent.`parent_id`,
+		agent.`status`,
+		agent.`corporation`,
+		agent.`create_time`,
+		agent.`operator`,
+		agent.`operator_name`,
+		agent.`operate_time`
+		FROM
+		`t_agent` AS parentAgent
+		LEFT JOIN `t_agent` AS
+		agent ON parentAgent.`id`=agent.`parent_id`
+
+		WHERE
+		parentAgent.id=#{parentAgentId}
+
+	</select>
+
+
+
+	<!-- 根据门店id查询信息（包含店员） -->
+	<select id="getChildAgentInfoByChildAgentId" parameterType="Map"
+		resultMap="ChildAgentMap">
+		SELECT
+		agent.`id`,
+		agent.`agent_name`,
+		agent.`address`,
+		agent.`agent_code`,
+		agent.`parent_id`,
+		agent2.`agent_name` AS
+		parent_name,
+		agent.`status`,
+		agent.`corporation`,
+		DATE_FORMAT(agent.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+		agent.`operator`,
+		agent.`operator_name`,
+		agent.`operate_time`,
+		agent.`barcode_url`,
+
+		t_user.`id`,
+		t_user.`user_name`,
+		t_user.`password`,
+		t_user.`nick_name`,
+		t_user.`real_name`,
+		t_user.`gender`,
+		t_user.`icon_url`,
+		t_user.`mobile`,
+		t_user.`email`,
+		DATE_FORMAT(t_user.create_time,'%Y-%m-%d %H:%i:%s') as sales_create_time,
+		t_user.`login_time`,
+		t_user.`login_status`
+		FROM
+		`t_agent` AS agent
+		LEFT JOIN
+		`t_agent` AS
+		agent2 ON
+		agent.`parent_id`=agent2.`id`
+		LEFT JOIN
+		`r_user_agent_role` ON
+		agent.id =
+		`r_user_agent_role`.agent_id
+		LEFT JOIN
+		`t_user`
+		ON
+		`r_user_agent_role`.user_id=`t_user`.id
+
+		WHERE
+		`r_user_agent_role`.`role_id`=5 AND
+		agent.`id`=#{childAgentId}
+		GROUP BY agent.`id`
+	</select>
+	<!--根据键值查询组织信息-->
+	<select id="selectByCodekey" parameterType="string" resultMap="BaseResultMap">
+	select
+		agent.`id`,
+		agent.`agent_name`,
+		agent.`address`,
+		agent.`agent_code`,
+		agent.`parent_id`,
+		agent.`status`,
+		agent.`corporation`,
+		agent.`create_time`,
+		agent.`operator`,
+		agent.`operator_name`,
+		agent.`operate_time`,
+		agent.`barcode_url`
+		from t_agent agent left join t_tenant_code_store barcode on agent.id=barcode.user_agent_id where barcode.code_key=#{codekey}
+	</select>
+
+	<select id="selectCompanyByPostCounpon" resultMap="AgentCouponResultMap">
+		select
+			agent.id,
+			agent.agent_name,
+			agent.agent_code,
+			agent.status,
+			<if test="type!=null and type==1">
+				(
+				select
+				count(role.user_id)
+				from r_user_agent_role role
+				left join t_user user
+				on role.user_id=`user`.id
+				where role.role_id=5
+				and `user`.login_status=1
+				and role.agent_id in(select a.id from t_agent a where a.parent_id=agent.id )
+				) as person_num
+			</if>
+			<if test="type!=null and type==2">
+				(
+				select
+				count(role.user_id)
+				from r_user_agent_role role
+				left join t_user user
+				on role.user_id=`user`.id
+				where role.role_id=1
+				and `user`.login_status=1
+				and role.agent_id in(select a.id from t_agent a where a.parent_id=agent.id )
+				) as person_num
+			</if>
+
+		from t_agent agent where agent.parent_id=0
+		<if test="status!=null">
+			and agent.status=#{status}
+		</if>
+		<if test="agentName!=null and agentName!=''">
+			and agent.agent_name like concat('%',#{agentName},'%')
+		</if>
+		order by convert(agent.agent_name using gbk)
+	</select>
+
+	<!--根据agentId修改agentName（r_agent_role）-->
+	<update id="updateAgentNameByAgentIdOnAgentRole" parameterType="map">
+		UPDATE `r_agent_role`
+		SET
+		`agent_name` = #{agentName}
+		WHERE `agent_id` = #{agentId}
+	</update>
+
+	<!--根据agentId修改agentName（t_agent_income）-->
+	<update id="updateAgentNameByAgentIdOnAgentIncome" parameterType="map">
+		UPDATE `t_agent_income`
+		SET
+		`agent_name` = #{agentName}
+		WHERE `agent_id` = #{agentId}
+	</update>
+
+	<!--根据agentId修改agentName（t_agent_withdwaw）-->
+	<update id="updateAgentNameByAgentIdOnAgentWithdraw" parameterType="map">
+		UPDATE `t_agent_withdraw`
+		SET
+		`agent_name` = #{agentName}
+		WHERE `agent_id` = #{agentId}
+	</update>
+
+
+
+</mapper>

@@ -1,0 +1,10 @@
+#mybatis:
+#  config-location: classpath:mybatis-config.xml
+
+
+#redis cluster
+#redis:
+#  cache:
+#    clusterNodes: localhost:8080
+#    commandTimeout: 5
+#    expireSeconds: 120

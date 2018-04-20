@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<partners>
+    <!--后台管理端  -->
+    <partner name="management"  appKey="management.admin" appSecret="661ee319dff061d4fb6532787f7b6wgl"></partner>
+    <!--前端h5管理端  -->
+    <partner name="forntmanage"  appKey="forntmanage.h5" appSecret="341ee319dff051d4fb653rh78f7c6"></partner>
+</partners>

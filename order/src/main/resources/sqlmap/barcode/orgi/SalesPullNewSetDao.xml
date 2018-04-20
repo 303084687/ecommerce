@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weichuang.ecommerce.barcode.PullNewMapper">
+	<resultMap id="BaseResultMap" type="com.weichuang.ecommerce.barcode.entity.SalesPullNewSetEntity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="aid" property="aid" jdbcType="INTEGER" />
+		<result column="pull_new_num" property="pullNewNum" jdbcType="INTEGER" />
+		<result column="pull_new_income" property="pullNewIncome" jdbcType="DECIMAL" />
+		<result column="ctime" jdbcType="TIMESTAMP" property="ctime" />
+		<result column="utime" jdbcType="TIMESTAMP" property="utime" />
+		<result column="operator_id" jdbcType="INTEGER" property="operatorId" />
+		<result column="state" jdbcType="INTEGER" property="state" />
+	</resultMap>
+	<resultMap id="ReceiveRedResultMap" type="com.weichuang.ecommerce.barcode.entity.SalesPullNewSetEntity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="aid" property="aid" jdbcType="INTEGER" />
+		<result column="pull_new_num" property="pullNewNum" jdbcType="INTEGER" />
+		<result column="pull_new_income" property="pullNewIncome" jdbcType="DECIMAL" />
+		<result column="ctime" jdbcType="TIMESTAMP" property="ctime" />
+		<result column="utime" jdbcType="TIMESTAMP" property="utime" />
+		<result column="operator_id" jdbcType="INTEGER" property="operatorId" />
+		<result column="state" jdbcType="INTEGER" property="state" />
+		<result column="isArrived" jdbcType="INTEGER" property="isArrived" />
+		<result column="hasRec" jdbcType="INTEGER" property="hasRec" />
+	</resultMap>
+	<sql id="Base_Column_List" >
+		id, aid, pull_new_num, pull_new_income, ctime, utime, operator_id, state
+	</sql>
+	<select id="getPullSetList" parameterType="Map" resultMap="BaseResultMap">
+		SELECT
+		`id`,
+		`pull_new_num`,
+		`pull_new_income`
+		FROM
+		`t_sales_pull_new_set` 
+	</select>
+	<select id="selectById" parameterType="int" resultMap="BaseResultMap" >
+		select
+		<include refid="Base_Column_List" />
+		from
+		t_sales_pull_new_set
+		where id=#{id}
+
+	</select>
+	<select id="findListByAid" parameterType="map" resultMap="ReceiveRedResultMap">
+		select
+		s.*,
+		(select count(*) from t_sale_red_envelope_rece where rid=s.id and sales_id=#{salesId}) as isArrived,
+		(select state from t_sale_red_envelope_rece where rid=s.id and sales_id=#{salesId}) as hasRec
+		from
+		t_sales_pull_new_set s
+		where s.aid=#{aid}  order by s.pull_new_num asc
+	</select>
+	<select id="findGtPullNewNum" parameterType="com.weichuang.ecommerce.barcode.entity.SalesPullNewSetEntity" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from
+		t_sales_pull_new_set
+		where aid=#{aid} and pull_new_num&gt;#{pullNewNum} order by pull_new_num asc limit 1
+	</select>
+	<select id="findEqPullNewNum" parameterType="com.weichuang.ecommerce.barcode.entity.SalesPullNewSetEntity" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from
+		t_sales_pull_new_set
+		where aid=#{aid} and pull_new_num=#{pullNewNum} order by pull_new_num asc limit 1
+	</select>
+	
+	
+	<select id="getAllPullNewSetList" parameterType="Map" resultMap="BaseResultMap">
+		SELECT
+		`id`,
+		`pull_new_num`,
+		`pull_new_income`
+		FROM
+		`t_sales_pull_new_set`  where state=1
+	</select>
+	
+	<update id="updatePullNewSet" parameterType="com.weichuang.ecommerce.barcode.entity.SalesPullNewSetEntity">
+		UPDATE `t_sales_pull_new_set`
+		<set>
+			
+			<if test="aid!=null and aid!=0">`aid`=#{aid,jdbcType=INTEGER},</if>
+			<if test="operatorId!=null and operatorId!=0">`operator_id`=#{operatorId,jdbcType=INTEGER},</if>
+			
+
+			<if test="pullNewIncome!=null ">`pull_new_income`=#{pullNewIncome,jdbcType=INTEGER},</if>
+			<if test="pullNewNum!=null ">`pull_new_num`=#{pullNewNum,jdbcType=INTEGER},</if>
+			<if test="utime==null">`utime`=(select now()),</if>
+			<if test="state!=null ">`state`=#{state,jdbcType=INTEGER},</if>
+		</set>
+		WHERE id=#{id}
+	</update>
+	
+	<insert id="addPullNewSet" parameterType="com.weichuang.ecommerce.barcode.entity.SalesPullNewSetEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `t_sales_pull_new_set`
+		(pull_new_num,
+		pull_new_income,
+		aid,
+		operator_id,
+		ctime,
+		state
+		)
+		VALUES
+		(#{pullNewNum,jdbcType=INTEGER},
+		#{pullNewIncome,jdbcType=INTEGER},
+		#{aid,jdbcType=INTEGER},
+		#{operatorId,jdbcType=INTEGER},
+		(select now()),
+		#{state,jdbcType=INTEGER}
+		
+		)
+	</insert>
+
+</mapper>

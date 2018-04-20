@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.order.orgi.OrderRecevierMapper">
+    <!-- 订单详情数据返回map -->
+    <resultMap type="com.weichuang.ecommerce.order.entity.OrderRecevierEntity" id="BaseResultMap">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="receiver_name" property="receiverName" jdbcType="VARCHAR"/>
+        <result column="province_id" property="provinceId" jdbcType="INTEGER"/>
+        <result column="city_id" property="cityId" jdbcType="INTEGER"/>
+        <result column="conuty_id" property="conutyId" jdbcType="INTEGER"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="mobile" property="mobile" jdbcType="VARCHAR"/>
+        <result column="postcode" property="postcode" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <!--<result column="send_time" property="sendTime" jdbcType="TIMESTAMP"/>-->
+        <!--<result column="tracking_num" property="trackingNum" jdbcType="VARCHAR"/>-->
+        <!--<result column="receive_time" property="receiveTime" jdbcType="TIMESTAMP"/>-->
+        <!--<result column="status" property="status" jdbcType="INTEGER"/>-->
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		`id`,
+		`order_id`,
+		`order_no`,
+		`receiver_name`,
+		`province_id`,
+		`city_id`,
+		`conuty_id`,
+		`address`,
+		`mobile`,
+		`postcode`,
+		`create_time`
+	</sql>
+
+    <!-- 增加订单收货人信息-->
+    <insert id="addOrderRecevier" parameterType="com.weichuang.ecommerce.order.entity.OrderRecevierEntity"
+            useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `ecommerce`.`t_order_recevier`
+		(`order_id`,
+		`order_no`,
+		`receiver_name`,
+		`province_id`,
+		`city_id`,
+		`conuty_id`,
+		`address`,
+		`mobile`,
+		`postcode`,
+		`create_time`
+		)
+		VALUES
+		(#{orderId,jdbcType=INTEGER},
+		#{orderNo,jdbcType=VARCHAR},
+		#{receiverName,jdbcType=VARCHAR},
+		#{provinceId,jdbcType=INTEGER},
+		#{cityId,jdbcType=INTEGER},
+		#{conutyId,jdbcType=INTEGER},
+		#{address,jdbcType=VARCHAR},
+		#{mobile,jdbcType=VARCHAR},
+		#{postcode,jdbcType=VARCHAR},
+		#{createTime,jdbcType=TIMESTAMP}
+		)
+	</insert>
+    <!--根据订单编号更新收货地址-->
+    <update id="updateOrderRecevierByOrderNo" parameterType="Map">
+		UPDATE `t_order_recevier`
+		SET
+		`receiver_name` = #{receiverName, jdbcType=VARCHAR} ,
+		`province_id` = #{provinceId, jdbcType=INTEGER} ,
+		`city_id` = #{cityId, jdbcType=INTEGER} ,
+		`conuty_id` = #{countyId, jdbcType=INTEGER} ,
+		`address` = #{address, jdbcType=VARCHAR} ,
+		`mobile` = #{mobile, jdbcType=VARCHAR}
+		WHERE `order_no` = #{orderNo, jdbcType=VARCHAR}
+	</update>
+    <select id="getOrderReceviersByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `ecommerce`.`t_order_recevier`
+        WHERE order_id = #{orderId,jdbcType=INTEGER}
+    </select>
+    <select id="getOrderReceviersByOrderNo" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `ecommerce`.`t_order_recevier`
+        WHERE order_no = #{orderNo,jdbcType=VARCHAR}
+    </select>
+</mapper>

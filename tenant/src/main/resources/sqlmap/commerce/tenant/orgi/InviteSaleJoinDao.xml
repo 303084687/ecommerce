@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.weichuang.ecommerce.tenant.InviteSaleJoinEntityMapper" >
+  <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.tenant.entity.InviteSaleJoinEntity" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="codekey" property="codekey" jdbcType="VARCHAR" />
+    <result column="invite_id" property="inviteId" jdbcType="INTEGER" />
+    <result column="sale_id" property="saleId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, codekey, invite_id, sale_id, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_invite_sale_join
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_invite_sale_join
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.weichuang.ecommerce.tenant.entity.InviteSaleJoinEntity" >
+    insert into t_invite_sale_join (id, codekey, invite_id, 
+      sale_id, create_time)
+    values (#{id,jdbcType=INTEGER}, #{codekey,jdbcType=VARCHAR}, #{inviteId,jdbcType=INTEGER}, 
+      #{saleId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <select id="getCountByCodekey" parameterType="string" resultType="int">
+    select count(*) from t_invite_sale_join where codekey=#{codekey}
+  </select>
+  <insert id="insertSelective" parameterType="com.weichuang.ecommerce.tenant.entity.InviteSaleJoinEntity" >
+    insert into t_invite_sale_join
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="codekey != null" >
+        codekey,
+      </if>
+      <if test="inviteId != null" >
+        invite_id,
+      </if>
+      <if test="saleId != null" >
+        sale_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="codekey != null" >
+        #{codekey,jdbcType=VARCHAR},
+      </if>
+      <if test="inviteId != null" >
+        #{inviteId,jdbcType=INTEGER},
+      </if>
+      <if test="saleId != null" >
+        #{saleId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.weichuang.ecommerce.tenant.entity.InviteSaleJoinEntity" >
+    update t_invite_sale_join
+    <set >
+      <if test="codekey != null" >
+        codekey = #{codekey,jdbcType=VARCHAR},
+      </if>
+      <if test="inviteId != null" >
+        invite_id = #{inviteId,jdbcType=INTEGER},
+      </if>
+      <if test="saleId != null" >
+        sale_id = #{saleId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.weichuang.ecommerce.tenant.entity.InviteSaleJoinEntity" >
+    update t_invite_sale_join
+    set codekey = #{codekey,jdbcType=VARCHAR},
+      invite_id = #{inviteId,jdbcType=INTEGER},
+      sale_id = #{saleId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

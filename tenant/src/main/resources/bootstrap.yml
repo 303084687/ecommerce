@@ -1,0 +1,117 @@
+server:
+  port: 8190
+  profile: @profileActive@
+#endpoints:
+#  redis:
+#    enabled: false
+
+spring:
+  profiles:
+    active: @profileActive@
+  application:
+    name: tenant
+  jackson:
+    serialization:
+      indent_output: true
+  cloud:
+    config:
+      profile: ${spring.profiles.active}
+#      uri: http://localhost:8888
+      enabled: true
+      discovery:
+        enabled: true
+        service-id: CONFIG
+  mail:
+    host: smtp.qiye.163.com
+    username: zhouhe@kokozu.net
+    password: 12!@#$Ab
+  properties:
+    mail:
+      smtp:
+       auth: true
+  jersey:
+      application-path: /api
+
+endpoints:
+  enabled: false
+  info:
+    enabled: true
+  health:
+    enabled: true
+  metrics:
+    enabled: true
+
+info:
+  app:
+    name: @project.artifactId@
+  build:
+    version: @project.version@
+
+#  boot:
+#    admin:
+#      url: http://localhost:8000
+#  output:
+#    ansi:
+#      enabled: DETECT
+# 自动配置属性
+# org.springframework.cloud.netflix.eureka.EurekaClientAutoConfiguration
+# org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 5  #心跳间隔
+    preferIpAddress: true
+    non-secure-port: ${server.port:8181}
+#    statusPageUrlPath: ${server.context-path}/info
+#    healthCheckUrlPath: ${server.context-path}/health
+#    homePageUrlPath: ${server.context-path}
+    metadata-map:
+      instanceId: ${spring.application.name}:${random.value}
+#      configPath: ${server.context-path}
+  client:
+#    healthcheck:
+#      enabled: true
+    registerWithEureka: true #注册本工程为服务
+    fetchRegistry: true
+    enabled: true
+    heartbeatExecutorThreadPoolSize: 10
+    cacheRefreshExecutorThreadPoolSize: 10
+    service-url:
+      defaultZone: http://${eureka.host}:${eureka.port}/eureka/
+  host: @eurekaHost@
+  port: @eurekaPort@
+
+AliPay:
+  payUrl: paytest.cias.net.cn
+  payUid: daguangming000
+  payMd5: kuwn3234000
+  payDes: uhb69OKH000
+  payChannelId: 31000
+  aliEmail: zhangjunying@kokozu.net000
+  pid: 2088611556978613000
+  aliMd5Key: 1h59nwc66afrlw0pt6zmutsid88ixrx0000
+  alipayPublicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDDI6d306Q8fIfCOaTXyiUeJHkrIvYISRcc73s3vF1ZT7XN8RNPwJxo8pWaJMmvyTn9N4HQ632qJBVHf8sxHi/fEsraprwCtzvzQETrNRwVxLO5jVmRGi60j8Ue1efIlzPXV9je9mkjzOmdssymZkh2QhUrCmZYI/FCEa3/cNMW0QIDAQAB/fEsraprwCtzvzQETrNRwVxLO5jVmRGi60j8Ue1efIlzPXV9je9mkjzOmdssymZkh2QhUrCmZYI/FCEa3/cNMW0QIDAQABing000
+  validSecs: 10000
+
+WxPay:
+  payUrl: paytest.cias.net.cn
+  payUid: daguangming000
+  payMd5: kuwn3234000
+  payDes: uhb69OKH000
+  payChannelId: 31000
+  aliEmail: zhangjunying@kokozu.net000
+  pid: 2088611556978613000
+  aliMd5Key: 1h59nwc66afrlw0pt6zmutsid88ixrx0000
+  alipayPublicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDDI6d306Q8fIfCOaTXyiUeJHkrIvYISRcc73s3vF1ZT7XN8RNPwJxo8pWaJMmvyTn9N4HQ632qJBVHf8sxHi/fEsraprwCtzvzQETrNRwVxLO5jVmRGi60j8Ue1efIlzPXV9je9mkjzOmdssymZkh2QhUrCmZYI/FCEa3/cNMW0QIDAQAB/fEsraprwCtzvzQETrNRwVxLO5jVmRGi60j8Ue1efIlzPXV9je9mkjzOmdssymZkh2QhUrCmZYI/FCEa3/cNMW0QIDAQABing000
+  wxAppId: wx58749dde7bc85692000
+  wxPid: 1273964801000
+  wxKey: zdwx123456789qwertyuiopasdfghjkl000
+  openId: 000
+  validSecs: 10000
+
+Paypal:
+  clientID: AeYI4o-iYVfVOxp-0WbPAjJxCLTsUOBpXk95sSNUjIIwFA7g99nkh2cl6cV31iL4WiZlxzK-lbztHFdc
+  clientSecret: EJFD-eOOj5xDK2_XOnqEE3eaRDjSKnyL_8b4QiTB3V1TuWf3fSvadzRyZ3dJjEApIDoDIC42wI6zoSCK
+  mode: sandbox
+#   clientID: AT8gCEaWUrTVXm3AQ7QTAeP6w4LnMImxzRQ0mFqk7M8RSaBle_Z82dlEhH0NFRTlClQaxd82y9ahDCMC
+#   clientSecret: ELjZDddtKT2A2G2MPCSEp3ov9W9c8vvxMxveWt4pVE78_d9pAznwJQUtllie7-uhneT72cePibM9uWL_
+#   mode: live

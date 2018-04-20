@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.order.orgi.SalesIncomeMapper">
+
+	<!-- 订单详情数据返回map -->
+	<resultMap type="com.weichuang.ecommerce.order.entity.SalesIncomeEntity" id="BaseResultMap">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="order_id" property="orderId" jdbcType="INTEGER"/>
+		<result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+		<result column="user_id" property="userId" jdbcType="INTEGER"/>
+		<result column="user_name" property="userName" jdbcType="VARCHAR"/>
+		<result column="sales_id" property="salesId" jdbcType="INTEGER"/>
+		<result column="sales_name" property="salesName" jdbcType="VARCHAR"/>
+		<result column="original_price" property="originalPrice" jdbcType="DECIMAL"/>
+		<result column="discount_money" property="discountMoney" jdbcType="DECIMAL"/>
+		<result column="taxation" property="taxation" jdbcType="DECIMAL"/>
+		<result column="freight" property="freight" jdbcType="DECIMAL"/>
+		<result column="receive_money" property="receiveMoney" jdbcType="DECIMAL"/>
+		<result column="percent" property="percent" jdbcType="FLOAT"/>
+		<result column="income" property="income" jdbcType="DECIMAL"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="withdraw" property="withdraw" jdbcType="INTEGER"/>
+		<result column="withdraw_time" property="withdrawTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	<!-- 增加业务人员提成记录-->
+	<insert id="addSalesIncome" parameterType="com.weichuang.ecommerce.order.entity.SalesIncomeEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `ecommerce`.`t_sales_income`
+		(`order_id`,
+		`order_no`,
+		`user_id`,
+		`user_name`,
+		`sales_id`,
+		`sales_name`,
+		`original_price`,
+		`discount_money`,
+		`taxation`,
+		`freight`,
+		`receive_money`,
+		`percent`,
+		`income`,
+		`create_time`,
+		`withdraw`,
+		`deleted`
+		)
+		VALUES
+		(#{orderId,jdbcType=INTEGER},
+		#{orderNo,jdbcType=VARCHAR},
+		#{userId,jdbcType=INTEGER},
+		#{userName,jdbcType=VARCHAR},
+		#{salesId,jdbcType=INTEGER},
+		#{salesName,jdbcType=VARCHAR},
+		#{originalPrice,jdbcType=DECIMAL},
+		#{discountMoney,jdbcType=DECIMAL},
+		#{taxation,jdbcType=DECIMAL},
+		#{freight,jdbcType=DECIMAL},
+		#{receiveMoney,jdbcType=DECIMAL},
+		#{percent,jdbcType=FLOAT},
+		#{income,jdbcType=DECIMAL},
+		NOW(),
+		#{withdraw,jdbcType=INTEGER},
+		0
+		)
+	</insert>
+	<!-- 查询业务人员提成记录-->
+	<select id="getSalesIncomeBySalesId" resultMap="BaseResultMap" parameterType="Map">
+		SELECT 	`id`,
+		`order_id`,
+		`order_no`,
+		`user_id`,
+		`user_name`,
+		`sales_id`,
+		`sales_name`,
+		`original_price`,
+		`discount_money`,
+		`taxation`,
+		`freight`,
+		`receive_money`,
+		`percent`,
+		`income`,
+		`create_time`,
+		`withdraw`,
+		`withdraw_time`
+		FROM
+		t_sales_income`
+		WHERE deleted=0
+		<if test="salesId != null and userId > 0"> AND sales_id = #{salesId, jdbcType=INTEGER}</if>
+		<if test="userId != null and userId > 0"> AND user_id = #{userId, jdbcType=INTEGER}</if>
+		<if test="userName != null and user_name != ''"> AND user_name = #{userName,jdbcType=VARCHAR}</if>
+		<if test="startTime !=null "> AND create_time > #{startTime,jdbcType=TIMESTAMP}</if>
+		<if test="endTime !=null "> AND create_time &lt; #{endTime,jdbcType=TIMESTAMP}</if>
+		LIMIT 0, 20;
+	</select>
+  </mapper>

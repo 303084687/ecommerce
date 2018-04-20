@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.tenant.orgi.AdminMapper">
+
+  <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.tenant.entity.AdminTemplate">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="roleId" jdbcType="INTEGER" property="roleId" />
+    <result column="admin_name" jdbcType="VARCHAR" property="adminName" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="sex" jdbcType="INTEGER" property="sex" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+     <result column="roleName" jdbcType="VARCHAR" property="roleName"/>
+     <result column="mobile" jdbcType="BLOB" property="mobile"  typeHandler="com.weichuang.ecommerce.Utf8BlobTypeHandler"/>
+  </resultMap>
+  <resultMap id="DetailMap" type="com.weichuang.ecommerce.tenant.entity.AdminEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="admin_name" jdbcType="VARCHAR" property="adminName" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="sex" jdbcType="INTEGER" property="sex" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="heading_url" jdbcType="VARCHAR" property="headingUrl" />
+    <result column="roleId" jdbcType="INTEGER" property="roleId" />
+    <result column="roleName" jdbcType="VARCHAR" property="roleName"/>
+    <result column="mobile" jdbcType="BLOB" property="mobile"  typeHandler="com.weichuang.ecommerce.Utf8BlobTypeHandler"/>
+  </resultMap>
+  <!--  增加-->
+  <insert id="addAdmin" parameterType="com.weichuang.ecommerce.tenant.entity.AdminEntity" useGeneratedKeys="true" keyProperty="id">
+          insert into t_admin (admin_name,password,name,mobile,sex,heading_url,status,create_time) values (#{adminName,jdbcType=VARCHAR}, 
+          #{password,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},AES_ENCRYPT(#{mobile,jdbcType=VARCHAR},#{keyCode}),
+          #{sex,jdbcType=INTEGER},#{headingUrl,jdbcType=VARCHAR},1,#{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <!--  修改-->
+  <update id="updateAdmin" parameterType="com.weichuang.ecommerce.tenant.entity.AdminEntity">
+     update t_admin
+    <set>
+      <if test="name !=null"> name=#{name,jdbcType=VARCHAR},</if>
+      <if test="headingUrl !=null"> heading_url=#{headingUrl,jdbcType=VARCHAR},</if>
+      <if test="mobile != null"> mobile =AES_ENCRYPT(#{mobile,jdbcType=VARCHAR},#{keyCode}),</if>
+      <if test="sex != null and sex >0 "> sex =#{sex,jdbcType=INTEGER},</if>
+      <if test="status != null and status >0 "> status =#{status,jdbcType=INTEGER},</if>
+    </set>
+      where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!-- 根据主键删除用户 -->
+  <delete id="deleteAdmin" parameterType="Map">
+     delete FROM t_admin where id=#{userId}
+  </delete>
+  <!--  列表查询带分页和模糊查询-->
+  <select id="getAdminList" parameterType="Map" resultMap="BaseResultMap">
+	  select a.id,a.admin_name,AES_DECRYPT(a.mobile,#{keyCode})mobile,a.`name`,a.sex,a.`status`,a.create_time,role.`name` as roleName,
+	  role.id as roleId from t_admin a LEFT JOIN r_admin_role r on a.id=r.admin_id LEFT JOIN t_role role on r.role_id=role.id where 1=1  
+	   <if test="status !=null and status>0"> and a.status=#{status}</if>
+	   <if test="adminName !=null and adminName !='' "> and INSTR(a.admin_name,#{adminName})</if>
+	  ORDER BY id desc
+  </select>
+  <!-- 设置启用或者停用 1启用2禁用-->
+  <update id="updateAdminStatus" parameterType="Map">
+     update t_admin set  status =#{status,jdbcType=INTEGER} where id = #{userId,jdbcType=INTEGER}
+  </update>  
+  <!-- 根据主键或者用户名查询详情 -->
+  <select id="getAdmin" parameterType="Map" resultMap="DetailMap">
+	  select a.id,a.admin_name,a.password,a.heading_url,AES_DECRYPT(a.mobile,#{keyCode})mobile,a.`name`,a.sex,a.`status`,a.create_time,role.`name` as roleName, 
+	  role.id as roleId from t_admin a LEFT JOIN r_admin_role r on a.id=r.admin_id LEFT JOIN t_role role on r.role_id=role.id where 1=1
+	   <if test="userId !=null and userId>0"> and a.id=#{userId,jdbcType=INTEGER}</if>
+	   <if test="adminName !=null and adminName !='' "> and a.admin_name=#{adminName,jdbcType=VARCHAR}</if>
+  </select>
+  <!-- 重置/修改密码 -->
+  <update id="resetPass" parameterType="Map">
+    update t_admin set password=#{pass} where id=#{userId}
+  </update>
+</mapper>

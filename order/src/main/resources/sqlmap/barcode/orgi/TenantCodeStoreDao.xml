@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.weichuang.ecommerce.barcode.TenantCodeStoreEntityMapper" >
+  <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.barcode.entity.TenantCodeStoreEntity" >
+    <id column="bid" property="bid" jdbcType="INTEGER" />
+    <result column="code_key" property="codeKey" jdbcType="VARCHAR" />
+    <result column="code_type" property="codeType" jdbcType="INTEGER" />
+    <result column="action_type" property="actionType" jdbcType="INTEGER" />
+    <result column="user_agent_id" property="userAgentId" jdbcType="INTEGER" />
+    <result column="address_url" property="addressUrl" jdbcType="VARCHAR" />
+    <result column="store_data" property="storeData" jdbcType="VARCHAR" />
+    <result column="invite_type" property="inviteType" jdbcType="INTEGER" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="ctime" property="ctime" jdbcType="DATE" />
+    <result column="other_data" property="otherData" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="UserRoleResultMap" type="com.weichuang.ecommerce.barcode.entity.UserRoleEntity" >
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="roleId" property="roleId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="UserCountResultMap" type="com.weichuang.ecommerce.barcode.entity.UserCountEntity">
+    <result column="all_count" property="allCount" jdbcType="INTEGER"/>
+    <result column="now_count" property="nowCount" jdbcType="INTEGER"/>
+    <result column="now_coupon_num" property="nowCouponNum" jdbcType="INTEGER"/>
+    <result column="all_coupon_num" property="allCouponNum" jdbcType="INTEGER"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    bid, code_key, code_type,action_type, user_agent_id, address_url,store_data,invite_type, state, ctime,other_data
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_tenant_code_store
+    where bid = #{bid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_tenant_code_store
+    where bid = #{bid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.weichuang.ecommerce.barcode.entity.TenantCodeStoreEntity" >
+    insert into t_tenant_code_store (bid, code_key, code_type, 
+      user_agent_id, store_data, state, 
+      ctime)
+    values (#{bid,jdbcType=INTEGER}, #{codeKey,jdbcType=VARCHAR}, #{codeType,jdbcType=INTEGER}, 
+      #{userAgentId,jdbcType=INTEGER}, #{storeData,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER}, 
+      #{ctime,jdbcType=DATE})
+  </insert>
+  <select id="selectInviteCountByUserId" parameterType="map" resultMap="UserCountResultMap">
+    select
+    (
+      select
+      count(*)
+      from t_tenant_code_store
+        where
+        code_type=3
+        <if test="type!=null and type==1">
+          and user_agent_id=#{userId}
+        </if>
+        <if test="type!=null and type==2">
+          and user_agent_id in( select user_id from r_user_agent_role where agent_id=#{userId})
+        </if>
+        <if test="type!=null and type==3">
+        and user_agent_id in( select user_id from r_user_agent_role rar left join t_agent ta on rar.agent_id=ta.id where ta.parent_id=#{userId})
+        </if>
+          and
+        action_type!=1
+    )
+    as  all_count,
+    (
+      select
+        count(*)
+      from
+        t_tenant_code_store
+      where
+      code_type=3
+    <if test="type!=null and type==1">
+      and user_agent_id=#{userId}
+    </if>
+    <if test="type!=null and type==2">
+      and user_agent_id in( select user_id from r_user_agent_role where agent_id=#{userId})
+    </if>
+    <if test="type!=null and type==3">
+      and user_agent_id in( select user_id from r_user_agent_role rar left join t_agent ta on rar.agent_id=ta.id where ta.parent_id=#{userId})
+    </if>
+        and
+      action_type!=1
+        and
+      DATE_FORMAT(ctime,'%Y-%m-%d')=DATE_FORMAT(now(),'%Y-%m-%d')
+    )
+      as now_count,
+    <if test="type!=null and type==1">
+    (
+      select
+      count(*)
+      from r_refer_recomme
+      where refer_user_id=#{userId}
+      ) as all_coupon_num,
+      (
+      select
+      count(*)
+      from r_refer_recomme
+      where refer_user_id=#{userId}
+      and DATE_FORMAT(create_time,'%Y-%m-%d')=DATE_FORMAT(now(),'%Y-%m-%d')) as now_coupon_num
+    </if>
+    <if test="type!=null and type==2">
+      (
+      select
+      count(*)
+      from r_refer_recomme
+      where refer_store_id=#{userId}
+      ) as all_coupon_num,
+      (
+      select
+      count(*)
+      from r_refer_recomme
+      where refer_store_id=#{userId}
+      and DATE_FORMAT(create_time,'%Y-%m-%d')=DATE_FORMAT(now(),'%Y-%m-%d')) as now_coupon_num
+    </if>
+    <if test="type!=null and type==3">
+      (
+      select
+      count(*)
+      from r_refer_recomme
+      where refer_company_id=#{userId}
+      ) as all_coupon_num,
+      (
+      select
+      count(*)
+      from r_refer_recomme
+      where refer_company_id=#{userId}
+      and DATE_FORMAT(create_time,'%Y-%m-%d')=DATE_FORMAT(now(),'%Y-%m-%d')) as now_coupon_num
+    </if>
+
+  </select>
+  <select id="selectByIdTypeStateOne" parameterType="com.weichuang.ecommerce.barcode.entity.TenantCodeStoreEntity" resultMap="BaseResultMap">
+
+    select
+    <include refid="Base_Column_List" />
+    from t_tenant_code_store
+    where 1=1
+    <if test="codeType!=null ">
+      and code_type=#{codeType}
+    </if>
+    <if test="actionType!=null ">
+      and action_type=#{actionType}
+    </if>
+    <if test="codeKey!=null ">
+      and code_key=#{codeKey}
+    </if>
+    <if test="userAgentId!=null ">
+      and user_agent_id=#{userAgentId}
+    </if>
+    <if test="state!=null ">
+      and state=#{state}
+    </if>
+    limit 1
+  </select>
+
+  <select id="selectByIdTypeStateList" parameterType="com.weichuang.ecommerce.barcode.entity.TenantCodeStoreEntity" resultMap="BaseResultMap">
+
+    select
+    <include refid="Base_Column_List" />
+    from t_tenant_code_store
+    where 1=1
+    <if test="codeType!=null ">
+      and code_type=#{codeType}
+    </if>
+    <if test="codeKey!=null ">
+      and code_key=#{codeKey}
+    </if>
+    <if test="userAgentId!=null ">
+      and user_agent_id=#{userAgentId}
+    </if>
+    <if test="state!=null ">
+      and state=#{state}
+    </if>
+
+  </select>
+  <insert id="insertSelective" parameterType="com.weichuang.ecommerce.barcode.entity.TenantCodeStoreEntity" >
+    insert into t_tenant_code_store
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bid != null" >
+        bid,
+      </if>
+      <if test="codeKey != null" >
+        code_key,
+      </if>
+      <if test="codeType != null" >
+      code_type,
+    </if>
+      <if test="actionType != null" >
+        action_type,
+      </if>
+      <if test="userAgentId != null" >
+        user_agent_id,
+      </if>
+      <if test="storeData != null" >
+        store_data,
+      </if>
+      <if test="addressUrl != null" >
+        address_url,
+      </if>
+      <if test="inviteType != null" >
+        invite_type,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="ctime != null" >
+        ctime,
+      </if>
+      <if test="otherData!=null">
+        other_data,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bid != null" >
+        #{bid,jdbcType=INTEGER},
+      </if>
+      <if test="codeKey != null" >
+        #{codeKey,jdbcType=VARCHAR},
+      </if>
+      <if test="codeType != null" >
+      #{codeType,jdbcType=INTEGER},
+    </if>
+      <if test="actionType != null" >
+        #{actionType,jdbcType=INTEGER},
+      </if>
+      <if test="userAgentId != null" >
+        #{userAgentId,jdbcType=INTEGER},
+      </if>
+      <if test="storeData != null" >
+        #{storeData,jdbcType=VARCHAR},
+      </if>
+      <if test="addressUrl != null" >
+        #{addressUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="inviteType != null" >
+        #{inviteType,jdbcType=INTEGER},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="ctime != null" >
+        #{ctime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="otherData != null" >
+        #{otherData,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.weichuang.ecommerce.barcode.entity.TenantCodeStoreEntity" >
+    update t_tenant_code_store
+    <set >
+      <if test="codeKey != null" >
+        code_key = #{codeKey,jdbcType=VARCHAR},
+      </if>
+      <if test="codeType != null" >
+        code_type = #{codeType,jdbcType=INTEGER},
+      </if>
+      <if test="actionType != null" >
+        action_type = #{actionType,jdbcType=INTEGER},
+      </if>
+      <if test="userAgentId != null" >
+        user_agent_id = #{userAgentId,jdbcType=INTEGER},
+      </if>
+      <if test="storeData != null" >
+        store_data = #{storeData,jdbcType=VARCHAR},
+      </if>
+      <if test="addressUrl != null" >
+        address_url = #{addressUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="inviteType != null" >
+        invite_type = #{inviteType,jdbcType=INTEGER},
+      </if>
+      <if test="ctime != null" >
+        ctime = #{ctime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where bid = #{bid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.weichuang.ecommerce.barcode.entity.TenantCodeStoreEntity" >
+    update t_tenant_code_store
+    set code_key = #{codeKey,jdbcType=VARCHAR},
+      code_type = #{codeType,jdbcType=INTEGER},
+      user_agent_id = #{userAgentId,jdbcType=INTEGER},
+      store_data = #{storeData,jdbcType=VARCHAR},
+      address_url = #{addressUrl,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      ctime = #{ctime,jdbcType=DATE}
+    where bid = #{bid,jdbcType=INTEGER}
+  </update>
+  <select id="selectUserCountByMobile" parameterType="string" resultType="int">
+    select count(id) from t_user where mobile=#{mobile}
+  </select>
+  <select id="selectUserRoleDetailById" parameterType="int" resultMap="UserRoleResultMap">
+    select t.id as id,ua.role_id as roleId from t_user t left join r_user_agent_role ua on t.id=user_id where t.id=#{id}
+  </select>
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.tenant.orgi.PullNewMapper">
+
+	<!--代理基础信息 -->
+	<resultMap id="BaseResultMap"
+		type="com.weichuang.ecommerce.tenant.entity.SalesPullNewSetEntity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="pull_new_num" property="pullNewNum" jdbcType="INTEGER" />
+		<result column="pull_new_income" property="pullNewIncome" jdbcType="DECIMAL" />
+	</resultMap>
+
+
+
+
+	
+
+	<!-- 根据公司id获取公司基本资料 -->
+
+	<select id="getPullSetList" parameterType="Map" resultMap="BaseResultMap">
+		SELECT
+		`id`,
+		`pull_new_num`,
+		`pull_new_income`
+		FROM
+		`t_sales_pull_new_set`
+	</select>
+
+
+
+	
+
+
+
+
+
+
+</mapper>

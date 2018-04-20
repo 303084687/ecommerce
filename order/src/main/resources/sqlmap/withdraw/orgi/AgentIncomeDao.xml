@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.withdraw.orgi.AgentIncomeMapper">
+
+    <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.withdraw.entity.AgentIncomeEntity">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="sales_id" property="salesId" jdbcType="INTEGER"/>
+        <result column="sales_name" property="salesName" jdbcType="VARCHAR"/>
+        <result column="agent_id" property="agentId" jdbcType="INTEGER"/>
+        <result column="agent_name" property="agentName" jdbcType="VARCHAR"/>
+        <result column="original_price" property="originalPrice" jdbcType="DECIMAL"/>
+        <result column="discount_money" property="discountMoney" jdbcType="DECIMAL"/>
+        <result column="receive_money" property="receiveMoney" jdbcType="DECIMAL"/>
+        <result column="taxation" property="taxation" jdbcType="DECIMAL"/>
+        <result column="percent" property="percent" jdbcType="FLOAT"/>
+        <result column="freight" property="freight" jdbcType="DECIMAL"/>
+        <result column="income" property="income" jdbcType="DECIMAL"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="withdraw" property="withdraw" jdbcType="VARCHAR"/>
+        <result column="withdraw_time" property="withdrawTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="BonusResultMap" type="com.weichuang.ecommerce.withdraw.entity.response.BonusTemplate">
+        <result column="agent_id" property="saleId" jdbcType="INTEGER"/>
+        <result column="income" property="everyMoney" jdbcType="DECIMAL"/>
+        <result column="day" property="day" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--代理商总计收入entity-->
+    <resultMap id="ParentAgentIncomeSumResultMap"
+               type="com.weichuang.ecommerce.withdraw.entity.ParentAgentDailyIncomeSumEntity">
+        <result column="agent_id" property="agentId" jdbcType="INTEGER"/>
+        <result column="agent_name" property="agentName" jdbcType="VARCHAR"/>
+        <result column="receive_money" property="receiveMoney" jdbcType="DECIMAL"/>
+        <result column="income" property="income" jdbcType="DECIMAL"/>
+        <result column="create_day" property="createDay" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--代理商收入按门店分类entity-->
+    <resultMap id="ParentAgentDailyIncomeResultMap"
+               type="com.weichuang.ecommerce.withdraw.entity.ParentAgentDailyIncomeEntity">
+        <result column="agent_id" property="agentId" jdbcType="INTEGER"/>
+        <result column="agent_name" property="agentName" jdbcType="VARCHAR"/>
+        <result column="receive_money" property="receiveMoney" jdbcType="DECIMAL"/>
+        <result column="income" property="income" jdbcType="DECIMAL"/>
+
+    </resultMap>
+    <!--代理商收入门店明细entity-->
+
+    <resultMap id="AgentDailyIncomeDetaiResultMap"
+               type="com.weichuang.ecommerce.withdraw.entity.AgentDailyIncomeDetailEntity">
+        <result column="sales_id" property="salesId" jdbcType="INTEGER"/>
+        <result column="sales_real_name" property="salesRealName" jdbcType="VARCHAR"/>
+        <result column="mobile" property="mobile" jdbcType="VARCHAR"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="receive_money" property="receiveMoney" jdbcType="DECIMAL"/>
+        <result column="income" property="income" jdbcType="DECIMAL"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        `id`,
+        `order_id`,
+        `order_no`,
+        `user_id`,
+        `user_name`,
+        `sales_id`,
+        `sales_name`,
+        `agent_id`,
+        `agent_name`,
+        `original_price`,
+        `discount_money`,
+        `receive_money`,
+        `taxation`,
+        `percent`,
+        `freight`,
+        `income`,
+        `create_time`,
+        `withdraw`,
+        `withdraw_time`
+    </sql>
+    <!--  增加-->
+    <insert id="addAgentIncome" parameterType="com.weichuang.ecommerce.withdraw.entity.AgentIncomeEntity"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `t_agent_income`
+        (
+        `order_id`,
+        `order_no`,
+        `user_id`,
+        `user_name`,
+        `sales_id`,
+        `sales_name`,
+        `agent_id`,
+        `agent_name`,
+        `original_price`,
+        `discount_money`,
+        `receive_money`,
+        `taxation`,
+        `percent`,
+        `freight`,
+        `income`,
+        `create_time`,
+        `withdraw`
+        )
+        VALUES
+        (#{orderId,jdbcType=INTEGER},
+        #{orderNo,jdbcType=VARCHAR},
+        #{userId,jdbcType=INTEGER},
+        #{userName,jdbcType=VARCHAR},
+        #{salesId,jdbcType=INTEGER},
+        #{salesName,jdbcType=VARCHAR},
+        #{agentId,jdbcType=INTEGER},
+        #{agentName,jdbcType=VARCHAR},
+        #{originalPrice,jdbcType=DECIMAL},
+        #{discountMoney,jdbcType=DECIMAL},
+        #{receiveMoney,jdbcType=DECIMAL},
+        #{taxation,jdbcType=DECIMAL},
+        #{percent,jdbcType=INTEGER},
+        #{freight,jdbcType=INTEGER},
+        #{income,jdbcType=DECIMAL},
+        #{createTime,jdbcType=TIMESTAMP},
+        0
+        )
+    </insert>
+    <!-- 根据预计收入记录列表,预计收入只是针对未提现的记录 -->
+    <select id="getAgentIncomeList" parameterType="Map" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        `t_agent_income`
+        WHERE withdraw = 0
+        <if test="agentId !=null and agentId > 0">AND agent_id = #{agentId, jdbcType=INTEGER}</if>
+        <if test="startTime !=null ">AND create_time >= #{startTime,jdbcType=TIMESTAMP}</if>
+        <if test="endTime !=null "> <![CDATA[ AND create_time <= #{endTime}]]></if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据代理商主键查询分红(一天7天以及可提现) -->
+    <select id="selectByAgentId" parameterType="Map" resultMap="BonusResultMap">
+     select t_agent.parent_id,DATE_FORMAT(t_agent_income.create_time,'%Y-%m-%d') AS DAY,SUM(t_agent_income.income)AS income FROM t_agent_income LEFT JOIN t_agent ON t_agent_income.agent_id=t_agent.id
+        WHERE t_agent.parent_id=#{agentId} AND t_agent_income.deleted=0  AND t_agent_income.withdraw =0 GROUP BY DAY
+   </select>
+
+    <!-- 根据代理商主键查询总收益 -->
+    <select id="selectSumListByAgentId" parameterType="Map" resultMap="BonusResultMap">
+        select t_agent.parent_id,DATE_FORMAT(t_agent_income.create_time,'%Y-%m-%d') AS DAY,SUM(t_agent_income.income)AS income FROM t_agent_income LEFT JOIN t_agent ON t_agent_income.agent_id=t_agent.id
+        WHERE t_agent.parent_id=#{agentId} AND t_agent_income.deleted=0  GROUP BY DAY
+    </select>
+    <!-- 根据代理商id和系统时间批量更新待提交或者已提现状态 -->
+    <update id="updateCashStatus" parameterType="Map">
+        update t_agent_income
+        <set>
+            <if test="systemTime != null">withdraw_time= #{systemTime},</if>
+            <if test="status != null and status >0 ">withdraw = #{status}</if>
+        </set>
+        where agent_id IN (SELECT id FROM t_agent WHERE parent_id=#{agentId}) AND withdraw=0
+        <![CDATA[ AND create_time <= #{oldTime}]]>
+    </update>
+
+    <!-- 根据代理商id和系统时间批量更新已提现状态 -->
+    <update id="updateCashStatusSuccess" parameterType="Map">
+        update t_agent_income
+        <set>
+            <if test="systemTime != null">withdraw_time= #{systemTime},</if>
+            <if test="status != null and status >0 ">withdraw = #{status}</if>
+        </set>
+        where agent_id IN (SELECT id FROM t_agent WHERE parent_id=#{agentId}) AND withdraw=1
+        <![CDATA[ AND withdraw_time = #{oldTime}]]>
+    </update>
+    <!-- 根据代理商id和系统时间查询可提现的金额,用于和前台传过来的金额进行二次比较 -->
+    <select id="cashMoney" parameterType="Map" resultMap="BonusResultMap">
+     select t_agent.parent_id,sum(t_agent_income.income)as income from t_agent_income LEFT JOIN t_agent ON t_agent_income.agent_id=t_agent.id where t_agent.parent_id=#{agentId}  and t_agent_income.withdraw =0 AND t_agent_income.deleted=0 <![CDATA[ AND t_agent_income.create_time <= #{systemTime}]]>
+    </select>
+
+    <!--订单退款后，逻辑删除代理商收入-->
+    <update id="deleteAgentIncomeByOrderNo" parameterType="java.lang.String">
+        UPDATE `t_agent_income`
+        SET	`deleted` = 1
+
+        WHERE `order_no` = #{orderNo, jdbcType=VARCHAR}
+    </update>
+
+    <!-- 根据门店主键查询总收益 -->
+    <select id="selectSumByAgentId" parameterType="Map" resultType="Decimal">
+        SELECT SUM(s1.income) AS income FROM (SELECT t.* FROM t_sales_income AS t LEFT JOIN t_agent_income  AS a ON t.`order_no`=a.`order_no`
+          WHERE a.agent_id=#{agentId}   AND t.deleted=0 GROUP BY t.`id`) AS s1;
+    </select>
+
+
+    <!-- 根据门店主键查询此门店的分红信息 -->
+    <select id="selectMsgByAgentId" parameterType="Map" resultMap="BonusResultMap">
+        select DATE_FORMAT(s1.create_time,'%Y-%m-%d') as day,sum(s1.income)as income from (SELECT t.* FROM t_sales_income AS t LEFT JOIN t_agent_income  AS a ON t.`order_no`=a.`order_no`
+        WHERE a.agent_id=#{agentId}   AND t.deleted=0 GROUP BY t.`id`) AS s1  WHERE s1.withdraw =0 GROUP BY day
+    </select>
+
+
+    <!-- 根据公司主键查询分红(一天7天以及可提现) -->
+    <select id="selectByParentAgentId" parameterType="Map" resultMap="BonusResultMap">
+        select DATE_FORMAT(t_agent_income.create_time,'%Y-%m-%d') as day,sum(t_agent_income.income)as income from t_agent_income LEFT JOIN t_agent ON t_agent_income.agent_id=t_agent.id
+        where t_agent.parent_id=#{parentAgentId} and t_agent_income.deleted=0  and t_agent_income.withdraw =0 GROUP BY day
+    </select>
+
+
+    <!-- 根据公司主键查询所有所属门店分红(一天7天以及可提现) -->
+    <select id="selectAllByParentAgentId" parameterType="Map" resultMap="BonusResultMap">
+        select DATE_FORMAT(s1.create_time,'%Y-%m-%d') as day,sum(s1.income)as income from (SELECT t.* FROM t_sales_income AS t LEFT JOIN t_agent_income  AS a ON t.`order_no`=a.`order_no` LEFT JOIN t_agent
+        ON a.`agent_id`=t_agent.`id` WHERE t_agent.parent_id=#{parentAgentId}   AND t.deleted=0 GROUP BY t.`id`) AS s1  WHERE s1.withdraw =0 GROUP BY day
+    </select>
+
+
+    <!-- 根据公司主键查询总收益 -->
+    <select id="selectSumByParentAgentId" parameterType="Map" resultType="Decimal">
+        SELECT SUM(income) FROM t_agent_income LEFT JOIN t_agent ON t_agent_income.`agent_id`=t_agent.`id` WHERE t_agent.`parent_id`=#{parentAgentId} and t_agent_income.deleted=0
+        
+    </select>
+
+
+    <!-- 根据公司主键查询所属店面总收益 -->
+    <select id="selectAllAgentSumByByParentAgentId" parameterType="Map" resultType="Decimal">
+        SELECT SUM(s1.income) AS income FROM (SELECT t.* FROM t_sales_income AS t LEFT JOIN t_agent_income  AS a ON t.`order_no`=a.`order_no` LEFT JOIN t_agent
+        ON a.`agent_id`=t_agent.`id`
+        WHERE t_agent.parent_id=#{parentAgentId}   AND t.deleted=0 GROUP BY t.`id`) AS s1
+    </select>
+    <!-- 查询当天所有公司的提成 -->
+
+    <select id="queryAllParentAgentOneDay" parameterType="Map" resultType="Decimal">
+        SELECT SUM(income) FROM t_agent_income WHERE create_time LIKE concat('%',#{today},'%') and  deleted=0
+        
+    </select>
+
+    <!-- 查询当天所有店面的提成 -->
+    <select id="queryAllAgentOneDay" parameterType="Map" resultType="Decimal">
+        SELECT SUM(income) FROM t_sales_income  WHERE create_time LIKE concat('%',#{today},'%') and  deleted=0
+        
+    </select>
+
+    <!-- 查询所有公司的提成 -->
+
+    <select id="queryParentAgentTotal" parameterType="Map" resultType="Decimal">
+        SELECT SUM(income) FROM t_agent_income where deleted=0
+        
+    </select>
+
+    <!-- 查询所有店面的提成 -->
+    <select id="queryAllAgentTotal" parameterType="Map" resultType="Decimal">
+        SELECT SUM(income) FROM t_sales_income  WHERE  deleted=0
+        
+    </select>
+
+
+    <!-- 根据公司的id查询所有提成的汇总（按天显示） -->
+    <select id="getParentAgentDailyIncomeSumByParentAgentId" parameterType="Map"
+            resultMap="ParentAgentIncomeSumResultMap">
+        SELECT
+        agent.parent_id AS agent_id,
+
+        SUM(income.receive_money) AS receive_money,
+        SUM(income.`income`) AS income,
+        DATE_FORMAT(income.create_time, '%Y-%m-%d') create_day
+        FROM
+        `t_agent_income` AS income LEFT JOIN t_agent AS agent ON income.agent_id=agent.id
+        WHERE agent.parent_id=#{parentAgentId} AND deleted=0
+        <if test="startTime != null and startTime != ''">AND income.create_time >= #{startTime}</if>
+        <if test="endTime != null  and endTime != ''"><![CDATA[ AND income.create_time <= #{endTime}]]></if>
+        GROUP BY create_day
+        ORDER BY create_day DESC
+    </select>
+
+    <!-- 根据门店的id查询某一天的预计的可提成的详细信息 -->
+    <select id="getAgentDailyIncomeDetailByAgentId" parameterType="Map" resultMap="AgentDailyIncomeDetaiResultMap">
+        SELECT
+        t_agent_income.sales_id,
+        t_user.real_name AS sales_real_name,
+        t_user.mobile,
+        t_agent_income.order_no,
+        t_agent_income.receive_money,
+        t_agent_income.income,
+        DATE_FORMAT(t_agent_income.create_time, '%T') as create_time
+        FROM
+        t_agent_income LEFT JOIN t_user ON t_agent_income.sales_id = t_user.id
+        WHERE t_agent_income.agent_id=#{agentId} AND deleted=0
+        <if test="startTime != null and startTime != ''">AND t_agent_income.create_time >= #{startTime}</if>
+        <if test="endTime != null  and endTime != ''"><![CDATA[ AND t_agent_income.create_time <= #{endTime}]]></if>
+        ORDER BY t_agent_income.create_time DESC
+    </select>
+
+    <!-- 根据公司的id查询某天的预计的可提成的详细信息（按门店显示） -->
+    <select id="getParentAgentDailyIncomeListByParentAgentId" parameterType="Map"
+            resultMap="ParentAgentDailyIncomeResultMap">
+        SELECT
+        t_agent_income.agent_id,
+        t_agent_income.agent_name,
+        SUM(t_agent_income.receive_money) AS receive_money,
+        SUM(t_agent_income.`income`) AS income
+        FROM
+        t_agent_income  LEFT JOIN t_agent  ON t_agent_income.agent_id=t_agent.id
+        WHERE t_agent.parent_id=#{parentAgentId} AND deleted=0
+        <if test="startTime != null and startTime != ''">AND t_agent_income.create_time >= #{startTime}</if>
+        <if test="endTime != null  and endTime != ''"><![CDATA[ AND t_agent_income.create_time <= #{endTime}]]></if>
+        GROUP BY t_agent_income.agent_id
+        ORDER BY t_agent_income.agent_id DESC
+    </select>
+
+</mapper>

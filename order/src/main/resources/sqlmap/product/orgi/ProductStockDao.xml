@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.product.orgi.ProductStockMapper">
+  
+  <!-- 根据商品主键或者code查询商品对用的sku信息-->
+	 <select id="getProductStockList" resultType="com.weichuang.ecommerce.product.entity.ProductStockEntity" parameterType="Map">
+	     SELECT product_id as productId,product_name as productName,product_code as productCode,good_id as goodId,good_code as goodCode,unit as unit,good_norms as goodNorms,good_month as goodMonth,good_name as goodName FROM t_product_stock WHERE 1=1 
+	       <if test="productId !=null and productId >0"> AND product_id =#{productId}</if>
+	       <if test="productCode !=null and productCode != ''"> AND product_code =#{productCode}</if>
+	 </select>
+  
+  <!-- 批量增加-->
+	  <insert id="addProductStock" parameterType="java.util.List">
+	      INSERT INTO t_product_stock (product_id,product_name,product_code,good_id,good_code,good_name,unit,good_norms,good_month,create_time)VALUES 
+	       <foreach collection="list" item="item" index="index" separator=",">
+	       (#{item.productId,jdbcType=INTEGER},#{item.productName,jdbcType=VARCHAR},#{item.productCode,jdbcType=VARCHAR},#{item.goodId,jdbcType=INTEGER},#{item.goodCode,jdbcType=VARCHAR},#{item.goodName,jdbcType=VARCHAR},#{item.unit,jdbcType=VARCHAR},
+	       #{item.goodNorms,jdbcType=VARCHAR},#{item.goodMonth,jdbcType=VARCHAR},now())
+	       </foreach>
+	  </insert>
+ 
+  <!-- 删除 -->
+	  <delete id="deleteProductStock" parameterType="Map">
+		   DELETE FROM t_product_stock WHERE product_id = #{productId,jdbcType=INTEGER}
+      </delete>
+
+</mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.coupon.orgi.ReferRecommeMapper">
+  <resultMap id="ReferResultMap" type="com.weichuang.ecommerce.coupon.entity.ReferCompany" >
+	   <result column="number" property="number" jdbcType="INTEGER"/>
+	   <result column="dayType" property="dayType" jdbcType="VARCHAR"/>
+	   <result column="refer_user_id" property="referUserId" jdbcType="INTEGER"/>
+	   <result column="refer_store_id" property="referStoreId" jdbcType="INTEGER"/>
+  </resultMap>
+  
+  <!-- 增加推荐者和被推荐者关系--> 
+  <insert id="addReferRecomme" parameterType="com.weichuang.ecommerce.coupon.entity.ReferRecomme">
+	INSERT INTO r_refer_recomme(recomme_open_id,refer_open_id,refer_user_id,refer_store_id,refer_company_id,type_code,create_time)
+	VALUES(#{recommeOpenId},#{referOpenId},#{referUserId},#{referStoreId},#{referCompanyId},#{typeCode},curdate())
+  </insert>
+ 
+ <!-- 根据门店或者公司以及员工查询数据统计 query 1公司2门店3个人,queryId 为对用的主键 -->
+  <select id="getReferList" parameterType="Map" resultMap="ReferResultMap">
+     SELECT COUNT(*) as number,
+     <if test="queryType==1">DATE_FORMAT(create_time,'%Y-%m-%d') as dayType from r_refer_recomme WHERE refer_company_id=#{queryId} GROUP BY dayType</if>
+     <if test="queryType==2">refer_store_id from r_refer_recomme WHERE refer_company_id=#{queryId} AND create_time=curdate() GROUP BY refer_store_id</if>
+     <if test="queryType==3">refer_user_id,refer_store_id  from r_refer_recomme WHERE refer_store_id=#{queryId} AND create_time=curdate() GROUP BY refer_user_id</if>
+  </select>
+</mapper>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.tenant.orgi.UserAddressMapper">
+  <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.tenant.entity.UserAddressEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="receive_name" jdbcType="VARCHAR" property="receiveName"/>
+    <result column="mobile" jdbcType="BLOB" property="mobile" typeHandler="com.weichuang.ecommerce.Utf8BlobTypeHandler" />
+    <result column="city_id" jdbcType="INTEGER" property="cityId" />
+    <result column="province_id" jdbcType="INTEGER" property="provinceId" />
+    <result column="conuty_id" jdbcType="INTEGER" property="conutyId" />
+    <result column="detail" jdbcType="BLOB" property="detail" typeHandler="com.weichuang.ecommerce.Utf8BlobTypeHandler" />
+    <result column="is_default" jdbcType="INTEGER" property="isDefault" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <!-- 地址返回实体 -->
+  <resultMap id="AddressResultMap" type="com.weichuang.ecommerce.tenant.entity.UserAddressTemplate">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="receive_name" jdbcType="VARCHAR" property="receiveName"/>
+    <result column="mobile" jdbcType="BLOB" property="mobile" typeHandler="com.weichuang.ecommerce.Utf8BlobTypeHandler" />
+    <result column="city_id" jdbcType="INTEGER" property="cityId" />
+    <result column="province_id" jdbcType="INTEGER" property="provinceId" />
+    <result column="conuty_id" jdbcType="INTEGER" property="conutyId" />
+    <result column="detail" jdbcType="BLOB" property="detail" typeHandler="com.weichuang.ecommerce.Utf8BlobTypeHandler" />
+    <result column="is_default" jdbcType="INTEGER" property="isDefault" />
+    <result column="provinceName" jdbcType="VARCHAR" property="provinceName" />
+    <result column="cityName" jdbcType="VARCHAR" property="cityName" />
+    <result column="conutyName" jdbcType="VARCHAR" property="conutyName" />
+  </resultMap>
+  <!-- 基础sql -->
+  <sql id="Base_Column_List">
+    id, user_id, receive_name,mobile,city_id,province_id, conuty_id, detail, is_default, create_time
+  </sql>
+  <!--根据用户主键查询所有收货地址  -->
+   <select id="getUserAddressList" parameterType="Map" resultMap="AddressResultMap">
+      select ua.id,ua.user_id,receive_name,AES_DECRYPT(ua.mobile, #{keyCode}) mobile,
+      AES_DECRYPT(ua.detail, #{keyCode}) detail,ua.city_id, ua.province_id, ua.conuty_id,ua.is_default,a2.foreign_name provinceName,
+      a3.foreign_name cityName,a4.foreign_name conutyName from t_user_address ua 
+      LEFT JOIN t_country a2 on ua.province_id=a2.id  LEFT JOIN t_country a3 on ua.city_id=a3.id 
+      LEFT JOIN t_country a4 on ua.conuty_id=a4.id WHERE ua.user_id=#{userId}  ORDER BY ua.is_default desc,ua.id desc
+   </select>
+  <!--根据用户id获取用户默认收货地址-->
+  <select id="getUserAddressDefault" parameterType="int" resultMap="AddressResultMap">
+    select ua.id,ua.user_id,receive_name,AES_DECRYPT(ua.mobile, #{keyCode}) mobile,
+    AES_DECRYPT(ua.detail, #{keyCode}) detail,ua.city_id, ua.province_id, ua.conuty_id,ua.is_default,a2.foreign_name provinceName,
+    a3.foreign_name cityName,a4.foreign_name conutyName from t_user_address ua
+    LEFT JOIN t_country a2 on ua.province_id=a2.id  LEFT JOIN t_country a3 on ua.city_id=a3.id
+    LEFT JOIN t_country a4 on ua.conuty_id=a4.id WHERE ua.user_id=#{userId} and ua.is_default=1
+  </select>
+  <!--根据主键查询详细信息  -->
+  <select id="getUserAddressInfo"  parameterType="Map" resultMap="AddressResultMap">
+      select ua.id,ua.user_id,receive_name,AES_DECRYPT(ua.mobile, #{keyCode}) mobile,
+      AES_DECRYPT(ua.detail, #{keyCode}) detail,ua.city_id, ua.province_id, ua.conuty_id,ua.is_default, 
+      a2.foreign_name provinceName,a3.foreign_name cityName,a4.foreign_name conutyName from t_user_address ua 
+      LEFT JOIN t_country a2 on ua.province_id=a2.id  LEFT JOIN t_country a3 on ua.city_id=a3.id 
+      LEFT JOIN t_country a4 on ua.conuty_id=a4.id where ua.id=#{id}
+  </select>
+  <!--增加收货地址  -->
+  <insert id="addUserAddress" parameterType="com.weichuang.ecommerce.tenant.entity.UserAddressEntity" useGeneratedKeys="true" keyProperty="id">
+     insert into t_user_address (user_id,receive_name,mobile,province_id,city_id,conuty_id,detail,
+        is_default,create_time) values(#{userId,jdbcType=INTEGER},#{receiveName,jdbcType=VARCHAR},AES_ENCRYPT(#{mobile,jdbcType=VARCHAR}, #{keyCode}),
+        #{provinceId,jdbcType=INTEGER},#{cityId,jdbcType=INTEGER},#{conutyId,jdbcType=INTEGER},AES_ENCRYPT(#{detail,jdbcType=VARCHAR},#{keyCode}),0,#{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <!--修改收货地址  -->
+  <update id="updateUserAddress" parameterType="com.weichuang.ecommerce.tenant.entity.UserAddressEntity">
+    update t_user_address
+    <set>
+      <if test="receiveName !=null and receiveName !=''">
+        receive_name = #{receiveName,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null">
+        mobile = AES_ENCRYPT(#{mobile,jdbcType=VARCHAR}, #{keyCode}),
+      </if>
+      <if test="cityId != null and cityId>0">
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="provinceId != null and provinceId>0">
+        province_id = #{provinceId,jdbcType=INTEGER},
+      </if>
+      <if test="conutyId != null and conutyId>0">
+        conuty_id = #{conutyId,jdbcType=INTEGER},
+      </if>
+      <if test="detail != null">
+        detail = AES_ENCRYPT(#{detail,jdbcType=VARCHAR}, #{keyCode}),
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!--根据主键和用户删除收货地址  -->
+  <delete id="deleteUserAddress" parameterType="Map">
+    delete from t_user_address where id=#{id} and user_id=#{userId}
+  </delete>
+  <!--根据主键和用户设置默认地址   -->
+  <update id="defaultAddress" parameterType="Map">
+    UPDATE t_user_address SET is_default= if(id=#{id},1,0) WHERE user_id=#{userId} and (is_default=1 or id=#{id})
+  </update>
+</mapper>

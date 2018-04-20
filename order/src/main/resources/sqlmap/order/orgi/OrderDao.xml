@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.order.orgi.OrderMapper">
+
+    <!-- 订单详情数据返回map -->
+    <resultMap type="com.weichuang.ecommerce.order.entity.OrderEntity" id="BaseResultMap">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="sales_id" property="salesId" jdbcType="INTEGER"/>
+        <result column="sales_name" property="salesName" jdbcType="VARCHAR"/>
+        <result column="item_count" property="itemCount" jdbcType="INTEGER"/>
+        <result column="original_price" property="originalPrice" jdbcType="DECIMAL"/>
+        <result column="coupon_code" property="couponCode" jdbcType="VARCHAR"/>
+        <result column="discount_money" property="discountMoney" jdbcType="DECIMAL"/>
+        <result column="taxation" property="taxation" jdbcType="DECIMAL"/>
+        <result column="freight" property="freight" jdbcType="DECIMAL"/>
+        <result column="receive_money" property="receiveMoney" jdbcType="DECIMAL"/>
+        <result column="source" property="source" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="payment_type" property="paymentType" jdbcType="INTEGER"/>
+        <result column="payment_sequence" property="paymentSequence" jdbcType="VARCHAR"/>
+        <result column="payment_time" property="paymentTime" jdbcType="TIMESTAMP"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="express" property="express" jdbcType="VARCHAR"/>
+        <result column="send_time" property="sendTime" jdbcType="INTEGER"/>
+        <result column="send_times" property="sendTimes" jdbcType="INTEGER"/>
+        <result column="sent_times" property="sentTimes" jdbcType="INTEGER"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 用户各个状态订单的数量 -->
+    <resultMap type="com.weichuang.ecommerce.order.entity.OrderStatusCountEntity" id="OrderStatusCountResultMap">
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="status_count" property="statusCount" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        t_order.`id`,
+        t_order.`user_id`,
+        t_order.`user_name`,
+        t_order.`order_no`,
+        t_order.`sales_id`,
+	    t_order.`sales_name`,
+        t_order.`item_count`,
+        t_order.`original_price`,
+        t_order.`coupon_code`,
+        t_order.`discount_money`,
+        t_order.`taxation`,
+        t_order.`freight`,
+        t_order.`receive_money`,
+        t_order.`source`,
+        t_order.`status`,
+        t_order.`payment_type`,
+        t_order.`payment_sequence`,
+        t_order.`payment_time`,
+        t_order.`express`,
+        t_order.`create_time`,
+        t_order.`send_time`,
+        t_order.`send_times`,
+        t_order.`sent_times`,
+        t_order.`end_time`,
+        t_order.`remark`
+    </sql>
+    <!-- 后台管理列表订单返回数据 -->
+    <resultMap type="com.weichuang.ecommerce.order.entity.AdminOrderEntity" id="AdminOrderResultMap">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="sales_id" property="salesId" jdbcType="INTEGER"/>
+        <result column="sales_name" property="salesName" jdbcType="VARCHAR"/>
+        <result column="user_nick_name" property="userNickName" jdbcType="VARCHAR"/>
+        <result column="sales_nick_name" property="salesNickName" jdbcType="VARCHAR"/>
+        <result column="sales_real_name" property="salesRealName" jdbcType="VARCHAR"/>
+        <result column="sales_mobile" property="salesMobile" jdbcType="VARCHAR"/>
+        <result column="item_count" property="itemCount" jdbcType="INTEGER"/>
+        <!--<result column="original_price" property="originalPrice" jdbcType="DECIMAL"/>-->
+        <!--<result column="discount_money" property="discountMoney" jdbcType="DECIMAL"/>-->
+        <!--<result column="taxation" property="taxation" jdbcType="DECIMAL"/>-->
+        <!--<result column="freight" property="freight" jdbcType="DECIMAL"/>-->
+        <result column="receive_money" property="receiveMoney" jdbcType="DECIMAL"/>
+        <result column="source" property="source" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <!--<result column="payment_type" property="paymentType" jdbcType="INTEGER"/>-->
+        <!--<result column="payment_sequence" property="paymentSequence" jdbcType="VARCHAR"/>-->
+        <!--<result column="payment_time" property="paymentTime" jdbcType="TIMESTAMP"/>-->
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <!--<result column="express" property="express" jdbcType="VARCHAR"/>-->
+        <result column="send_time" property="sendTime" jdbcType="INTEGER"/>
+        <result column="send_times" property="sendTimes" jdbcType="INTEGER"/>
+        <result column="sent_times" property="sentTimes" jdbcType="INTEGER"/>
+        <!--<result column="remark" property="remark" jdbcType="VARCHAR"/>-->
+    </resultMap>
+    <!-- 后台管理列表订单返回数据 -->
+    <sql id="Admin_Base_Column_List">
+        t_order.`id`,
+        t_order.`user_id`,
+        t_order.`user_name`,
+        t_order.`order_no`,
+        t_order.`sales_id`,
+        t_order.`sales_name`,
+        t_user.`nick_name` AS user_nick_name,
+        t_sales.`nick_name` AS sales_nick_name,
+        t_sales.real_name AS sales_real_name,
+        t_sales.mobile AS sales_mobile,
+        t_order.`item_count`,
+        t_order.`receive_money`,
+        t_order.`source`,
+        t_order.`status`,
+        t_order.`express`,
+        t_order.`create_time`,
+        t_order.`send_time`,
+        t_order.`send_times`,
+        t_order.`sent_times`,
+        t_order.`remark`
+    </sql>
+    <!-- 后台管理列表订单详情 -->
+    <resultMap type="com.weichuang.ecommerce.order.entity.AdminOrderDetailEntity" id="AdminOrderDetailResultMap">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="sales_id" property="salesId" jdbcType="INTEGER"/>
+        <result column="sales_name" property="salesName" jdbcType="VARCHAR"/>
+        <result column="user_nick_name" property="userNickName" jdbcType="VARCHAR"/>
+        <result column="sales_nick_name" property="salesNickName" jdbcType="VARCHAR"/>
+        <result column="sales_real_name" property="salesRealName" jdbcType="VARCHAR"/>
+        <result column="sales_mobile" property="salesMobile" jdbcType="VARCHAR"/>
+        <result column="item_count" property="itemCount" jdbcType="INTEGER"/>
+        <result column="original_price" property="originalPrice" jdbcType="DECIMAL"/>
+        <result column="coupon_code" property="couponCode" jdbcType="VARCHAR"/>
+        <result column="discount_money" property="discountMoney" jdbcType="DECIMAL"/>
+        <result column="taxation" property="taxation" jdbcType="DECIMAL"/>
+        <result column="freight" property="freight" jdbcType="DECIMAL"/>
+        <result column="receive_money" property="receiveMoney" jdbcType="DECIMAL"/>
+        <result column="source" property="source" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="payment_type" property="paymentType" jdbcType="INTEGER"/>
+        <result column="payment_sequence" property="paymentSequence" jdbcType="VARCHAR"/>
+        <result column="payment_time" property="paymentTime" jdbcType="TIMESTAMP"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="express" property="express" jdbcType="VARCHAR"/>
+        <result column="send_time" property="sendTime" jdbcType="INTEGER"/>
+        <result column="send_times" property="sendTimes" jdbcType="INTEGER"/>
+        <result column="sent_times" property="sentTimes" jdbcType="INTEGER"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!-- 后台管理列表订单详情数据 -->
+    <sql id="Admin_Detail_Column_List">
+        t_order.`id`,
+        t_order.`user_id`,
+        t_order.`user_name`,
+        t_order.`order_no`,
+        t_order.`sales_id`,
+        t_order.`sales_name`,
+        t_user.`nick_name` AS user_nick_name,
+        t_sales.`nick_name` AS sales_nick_name,
+        t_sales.real_name AS sales_real_name,
+        t_sales.mobile AS sales_mobile,
+        t_order.`item_count`,
+        t_order.`original_price`,
+        t_order.`coupon_code`,
+        t_order.`discount_money`,
+        t_order.`taxation`,
+        t_order.`freight`,
+        t_order.`receive_money`,
+        t_order.`source`,
+        t_order.`status`,
+        t_order.`payment_type`,
+        t_order.`payment_sequence`,
+        t_order.`payment_time`,
+        t_order.`express`,
+        t_order.`create_time`,
+        t_order.`send_time`,
+        t_order.`send_times`,
+        t_order.`sent_times`,
+        t_order.`end_time`,
+        t_order.`remark`
+    </sql>
+    <!--  增加-->
+    <insert id="addOrder" parameterType="com.weichuang.ecommerce.order.entity.OrderEntity" useGeneratedKeys="true"
+            keyProperty="id">
+    INSERT INTO `ecommerce`.`t_order`
+    (`user_id`,
+    `user_name`,
+    `order_no`,
+    `sales_id`,
+    `sales_name`,
+    `item_count`,
+    `original_price`,
+    `coupon_code`,
+    `discount_money`,
+    `taxation`,
+    `freight`,
+    `receive_money`,
+    `source`,
+    `status`,
+    `payment_type`,
+    `create_time`,
+    `express`,
+    `send_time`,
+    `send_times`,
+    `remark`
+    )
+    VALUES
+    (#{userId,jdbcType=INTEGER},
+    #{userName,jdbcType=VARCHAR},
+    #{orderNo,jdbcType=VARCHAR},
+    #{salesId,jdbcType=INTEGER},
+    #{salesName,jdbcType=VARCHAR},
+    #{itemCount,jdbcType=INTEGER},
+    #{originalPrice,jdbcType=DECIMAL},
+    #{couponCode,jdbcType=VARCHAR},
+    #{discountMoney,jdbcType=DECIMAL},
+    #{taxation,jdbcType=DECIMAL},
+    #{freight,jdbcType=DECIMAL},
+    #{receiveMoney,jdbcType=DECIMAL},
+    #{source,jdbcType=INTEGER},
+    #{status,jdbcType=INTEGER},
+    #{paymentType,jdbcType=INTEGER},
+    NOW(),
+    #{express,jdbcType=VARCHAR},
+    #{sendTime,jdbcType=INTEGER},
+    #{sendTimes,jdbcType=INTEGER},
+    #{remark,jdbcType=VARCHAR}
+    )
+    </insert>
+    <!--查询订单详情-->
+    <select id="getOrderById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        `ecommerce`.`t_order`
+        WHERE id = #{id,jdbcType=VARCHAR}
+    </select>
+    <!--查询订单详情-->
+    <select id="getOrderByNo" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        `ecommerce`.`t_order`
+        WHERE order_no = #{orderNo,jdbcType=INTEGER}
+    </select>
+    <select id="getOrderList" resultMap="BaseResultMap" parameterType="Map">
+        SELECT `id`,
+        `user_id`,
+        `user_name`,
+        `order_no`,
+        `item_count`,
+        `original_price`,
+        `discount_money`,
+        `taxation`,
+        `freight`,
+        `receive_money`,
+        `source`,
+        `status`,
+        `create_time`
+        FROM
+        `ecommerce`.`t_order`
+        WHERE 1 = 1
+        <if test="userId !=null and userId > 0">AND user_id = #{userId, jdbcType=INTEGER}</if>
+        <if test="status !=null and status > 0">AND status = #{status,jdbcType=INTEGER}</if>
+        <if test="startTime != null and startTime != ''">AND create_time >= #{startTime}</if>
+        <if test="endTime != null  and endTime != ''"><![CDATA[ AND create_time <= #{endTime}]]></if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!--查询下单未支付过期订单-->
+    <select id="getOrderExpire" resultMap="BaseResultMap" parameterType="Map">
+      SELECT `id`,
+        `user_id`,
+        `user_name`,
+        `order_no`,
+        `item_count`,
+        `original_price`,
+        `discount_money`,
+        `taxation`,
+        `freight`,
+        `receive_money`,
+        `source`,
+        `status`,
+        `create_time`
+        FROM
+        `ecommerce`.`t_order`
+
+        WHERE  status = 1 AND  is_del = 0
+
+        <if test="days != null  and days != ''">  <![CDATA[ AND TO_DAYS(NOW()) - TO_DAYS(create_time) > #{days,jdbcType=INTEGER} ]]> </if>
+
+        ORDER BY create_time DESC
+    </select>
+
+    <!--查询最近几分钟未支付订单-->
+    <select id="getOrderRemind" resultMap="BaseResultMap" parameterType="Map">
+        SELECT `id`,
+        `user_id`,
+        `user_name`,
+        `order_no`,
+        `item_count`,
+        `original_price`,
+        `discount_money`,
+        `taxation`,
+        `freight`,
+        `receive_money`,
+        `source`,
+        `status`,
+        `create_time`
+        FROM
+        `ecommerce`.`t_order`
+
+        WHERE  status = 1 and is_remind = 0  AND  is_del = 0
+
+        <if test="minute != null  and minute != ''">  <![CDATA[ AND  create_time>=DATE_SUB(NOW(),INTERVAL #{minute,jdbcType=INTEGER} MINUTE) ]]> </if>
+
+        ORDER BY create_time DESC
+    </select>
+
+    <!--根据订单编号更新订单状态-->
+    <update id="updateOrderStatusByOrderNo" parameterType="Map">
+        UPDATE `t_order`
+        SET	`status` = #{status,jdbcType=INTEGER}
+        WHERE `order_no` = #{orderNo, jdbcType=VARCHAR}
+    </update>
+    <!--根据订单编号更新订单的支付状态-->
+    <update id="updatePaymentStatusByOrderNo" parameterType="Map">
+        UPDATE `t_order`
+        SET
+        `status` = #{status,jdbcType=INTEGER},
+        `payment_type` =  #{paymentType,jdbcType=INTEGER},
+        `payment_sequence` = #{paymentSequence,jdbcType=VARCHAR},
+        `payment_time` =  NOW()
+        WHERE `order_no` = #{orderNo, jdbcType=VARCHAR}
+    </update>
+
+    <!--后台订单管理-->
+    <!--已发货的订单列表的查询(配送中的订单)-->
+    <select id="getSentOrderList" resultMap="AdminOrderResultMap" parameterType="Map">
+        SELECT
+        <include refid="Admin_Base_Column_List"/>
+        ,t_order_recevier.`receiver_name` AS receiverName,
+        t_order_recevier.`mobile` AS receiverMobile,
+        t_order_recevier.`address` AS receiverAddress
+        FROM
+        t_order LEFT JOIN t_user AS t_user ON t_order.user_id=t_user.id
+        LEFT JOIN t_user AS t_sales ON t_order.sales_id=t_sales.id
+        LEFT OUTER JOIN t_order_recevier ON t_order.id=t_order_recevier.order_id
+        WHERE t_order.status=2  AND  t_order.is_del = 0
+        <if test="orderNo != null and orderNo != ''">AND t_order.`order_no` = #{orderNo,jdbcType=VARCHAR}</if>
+        <if test="mobile != null and mobile != ''">AND t_user.`mobile` = #{mobile,jdbcType=VARCHAR}</if>
+        <if test="createStartTime != null and createStartTime != ''">AND t_order.`create_time` >= #{createStartTime}
+        </if>
+        <if test="createEndTime != null  and createEndTime != ''">
+            <![CDATA[ AND t_order.`create_time` <= #{createEndTime}]]></if>
+        <if test="receiverName !=null and receiverName != ''">AND t_order_recevier.receiver_name = #{receiverName,jdbcType=VARCHAR}</if>
+        <if test="receiverMobile !=null and receiverMobile != ''">AND t_order_recevier.mobile = #{receiverMobile,jdbcType=VARCHAR}</if>
+        AND EXISTS(SELECT id FROM t_order_sent
+        WHERE t_order_sent.order_no=t_order.order_no
+        AND t_order_sent.status=2
+        <if test="sendStartTime != null and sendStartTime != ''">AND t_order_sent.sending_time >= #{sendStartTime}</if>
+        <if test="sendEndTime != null  and sendEndTime != ''">
+            <![CDATA[ AND t_order_sent.sending_time <= #{sendEndTime}]]></if>
+        )
+        ORDER BY t_order.create_time DESC
+    </select>
+    <!--待发货的订单列表的查询(配送中的订单)-->
+    <select id="getUnsentOrderList" resultMap="AdminOrderResultMap" parameterType="Map">
+        SELECT
+        <include refid="Admin_Base_Column_List"/>
+        ,t_order_recevier.`receiver_name` AS receiverName,
+        t_order_recevier.`mobile` AS receiverMobile,
+        t_order_recevier.`address` AS receiverAddress
+        FROM
+        t_order LEFT JOIN t_user AS t_user ON t_order.user_id=t_user.id
+        LEFT JOIN t_user AS t_sales ON t_order.sales_id=t_sales.id
+        LEFT OUTER JOIN t_order_recevier ON t_order.id=t_order_recevier.order_id
+        WHERE t_order.status=2 AND t_order.is_del = 0
+        <if test="orderNo != null and orderNo != ''">AND t_order.`order_no` = #{orderNo,jdbcType=VARCHAR}</if>
+        <if test="mobile != null and mobile != ''">AND t_user.`mobile` = #{mobile,jdbcType=VARCHAR}</if>
+        <if test="createStartTime != null and createStartTime != ''">AND t_order.`create_time` >= #{createStartTime}</if>
+        <if test="createEndTime != null  and createEndTime != ''">
+            <![CDATA[ AND t_order.`create_time` <= #{createEndTime}]]></if>
+        <if test="receiverName !=null and receiverName != ''">AND t_order_recevier.receiver_name = #{receiverName,jdbcType=VARCHAR}</if>
+        <if test="receiverMobile !=null and receiverMobile != ''">AND t_order_recevier.mobile = #{receiverMobile,jdbcType=VARCHAR}</if>
+        AND EXISTS(SELECT id FROM t_order_sent
+        WHERE t_order_sent.order_no=t_order.order_no
+        AND t_order_sent.status=1
+        <if test="sendStartTime != null and sendStartTime != ''">AND t_order_sent.send_time >= #{sendStartTime}</if>
+        <if test="sendEndTime != null  and sendEndTime != ''">
+            <![CDATA[ AND t_order_sent.send_time <= #{sendEndTime}]]></if>
+        )
+        ORDER BY t_order.create_time DESC
+    </select>
+    <!--订单列有，后台管理-->
+    <select id="getAdminOrderList" resultMap="AdminOrderResultMap" parameterType="Map">
+        SELECT
+        <include refid="Admin_Base_Column_List"/>
+        ,t_order_recevier.`receiver_name` AS receiverName,
+        t_order_recevier.`mobile` AS receiverMobile,
+        t_order_recevier.`address` AS receiverAddress
+        FROM t_order LEFT JOIN t_user AS t_user ON t_order.user_id=t_user.id
+        LEFT JOIN t_user AS t_sales ON t_order.sales_id=t_sales.id
+        LEFT OUTER JOIN t_order_recevier ON t_order.id=t_order_recevier.order_id
+        WHERE  t_order.is_del = 0
+        <if test="createStartTime != null and createStartTime != ''">AND t_order.`create_time` >= #{createStartTime}
+        </if>
+        <if test="createEndTime != null  and createEndTime != ''">
+            <![CDATA[ AND t_order.`create_time` <= #{createEndTime}]]></if>
+        <if test="orderNo != null and orderNo != ''">AND t_order.`order_no` = #{orderNo,jdbcType=VARCHAR}</if>
+        <if test="mobile != null and mobile != ''">AND t_user.`mobile` = #{mobile,jdbcType=VARCHAR}</if>
+        <if test="status !=null and status > 0">AND t_order.status = #{status,jdbcType=INTEGER}</if>
+        <if test="receiverName !=null and receiverName != ''">AND t_order_recevier.receiver_name = #{receiverName,jdbcType=VARCHAR}</if>
+        <if test="receiverMobile !=null and receiverMobile != ''">AND t_order_recevier.mobile = #{receiverMobile,jdbcType=VARCHAR}</if>
+        ORDER BY t_order.create_time DESC
+    </select>
+
+    <!--订单回收站 后台管理-->
+    <select id="getAdminOrderRecycle" resultMap="AdminOrderResultMap" parameterType="Map">
+        SELECT
+        <include refid="Admin_Base_Column_List"/>
+        ,t_order_recevier.`receiver_name` AS receiverName,
+        t_order_recevier.`mobile` AS receiverMobile,
+        t_order_recevier.`address` AS receiverAddress
+        FROM t_order LEFT JOIN t_user AS t_user ON t_order.user_id=t_user.id
+        LEFT JOIN t_user AS t_sales ON t_order.sales_id=t_sales.id
+        LEFT OUTER JOIN t_order_recevier ON t_order.id=t_order_recevier.order_id
+        WHERE  t_order.is_del = 1
+        <if test="createStartTime != null and createStartTime != ''">AND t_order.`create_time` >= #{createStartTime}
+        </if>
+        <if test="createEndTime != null  and createEndTime != ''">
+            <![CDATA[ AND t_order.`create_time` <= #{createEndTime}]]></if>
+        <if test="orderNo != null and orderNo != ''">AND t_order.`order_no` = #{orderNo,jdbcType=VARCHAR}</if>
+        <if test="mobile != null and mobile != ''">AND t_user.`mobile` = #{mobile,jdbcType=VARCHAR}</if>
+        <if test="status !=null and status > 0">AND t_order.status = #{status,jdbcType=INTEGER}</if>
+        <if test="receiverName !=null and receiverName != ''">AND t_order_recevier.receiver_name = #{receiverName,jdbcType=VARCHAR}</if>
+        <if test="receiverMobile !=null and receiverMobile != ''">AND t_order_recevier.mobile = #{receiverMobile,jdbcType=VARCHAR}</if>
+        ORDER BY t_order.create_time DESC
+    </select>
+
+    <!--查询订单详情-->
+    <select id="getAdminOrderByNo" resultMap="AdminOrderDetailResultMap" parameterType="java.lang.String">
+        SELECT
+        <include refid="Admin_Detail_Column_List"/>
+        FROM t_order LEFT JOIN t_user AS t_user ON t_order.user_id=t_user.id
+        LEFT JOIN t_user AS t_sales ON t_order.sales_id=t_sales.id
+        WHERE order_no = #{orderNo,jdbcType=VARCHAR}
+    </select>
+    <!--累计发货次数加1-->
+    <update id="updateOrderSentTimesByOrderNo" parameterType="java.lang.String">
+        UPDATE `t_order`
+        SET
+        `sent_times` =  `sent_times` + 1
+        WHERE `order_no` = #{orderNo, jdbcType=VARCHAR}
+    </update>
+    <!--更新订单的发货时间-->
+    <update id="updateOrderSendTimeByOrderNo" parameterType="Map">
+        UPDATE `t_order`
+        SET
+        `send_time` =  #{sendTime,jdbcType=INTEGER}
+        WHERE `order_no` = #{orderNo, jdbcType=VARCHAR}
+    </update>
+    <!--end 后台订单管理-->
+
+    <!--根据用户id查询各个订单的数量-->
+    <select id="getOrderStatusCountByUserId" resultMap="OrderStatusCountResultMap" parameterType="java.lang.Integer">
+      SELECT `status`,COUNT(*) AS status_count,user_id
+      FROM `t_order`
+      WHERE user_id=#{userId,jdbcType=VARCHAR}
+      GROUP BY  `status`
+    </select>
+
+    <!--更新订单提醒状态-->
+    <update id="updateOrderRemindByOrderNo" parameterType="Map">
+        UPDATE `t_order`
+        SET
+        `is_remind` =  1
+        WHERE `order_no` = #{orderNo, jdbcType=VARCHAR}
+    </update>
+
+    <!--根据订单编号删除订单-->
+    <update id="updateOrdeStatusToDel" parameterType="Map">
+        UPDATE `t_order`
+        SET	`is_del` = 1
+        WHERE `order_no` = #{orderNo, jdbcType=VARCHAR}
+    </update>
+
+</mapper>

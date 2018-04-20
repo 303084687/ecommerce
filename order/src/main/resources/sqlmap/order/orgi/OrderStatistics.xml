@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.order.orgi.OrderStatistics">
+
+
+    <resultMap id="TransactionStatisticsMap" type="com.weichuang.ecommerce.order.entity.TransactionStatisticsEntity">
+        <result column="receive_money" property="customerPrice" jdbcType="DECIMAL"/>
+        <result column="consumer_price" property="consumerPrice" jdbcType="DECIMAL"/>
+        <result column="consumer_orderNum" property="consumerOrderNum" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--会员交易统计-->
+    <select id="getTransactionStatistics" parameterType="int" resultMap="TransactionStatisticsMap">
+        select
+            (select sum(o.receive_money)  from t_order o where o.status=3 and o.user_id=#{userid}) as consumer_price,
+            (select count(*)  from t_order o where o.status=3 and o.user_id=#{userid}) consumer_orderNum,
+            o.create_time,
+            o.receive_money
+        from
+        (select
+			r.create_time,o.receive_money
+		    FROM `ecommerce`.`t_order_recevier` r
+		    left join t_order o on r.order_id=o.id
+		    where o.status=2 and o.user_id=#{userid} order by o.create_time desc limit 1
+		) o
+    </select>
+</mapper>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.weichuang.ecommerce.barcode.SalesShareEnvelopeWithdrawDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.barcode.entity.SalesShareEnvelopeWithdrawDetail" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="withdraw_id" property="withdrawId" jdbcType="INTEGER" />
+    <result column="get_envelop_id" property="getEnvelopId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, withdraw_id, get_envelop_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_sales_share_envelop_withdraw_detail
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_sales_share_envelop_withdraw_detail
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.weichuang.ecommerce.barcode.entity.SalesShareEnvelopeWithdrawDetail" >
+    insert into t_sales_share_envelop_withdraw_detail (id, withdraw_id, get_envelop_id
+      )
+    values (#{id,jdbcType=INTEGER}, #{withdrawId,jdbcType=INTEGER}, #{getEnvelopId,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertDetailList" parameterType="java.util.List">
+    insert into t_sales_share_envelop_withdraw_detail
+    (withdraw_id,get_envelop_id)
+    values
+    <foreach collection="list"  separator="," item="item" index="index">
+    (#{item.withdrawId},#{item.getEnvelopId})
+    </foreach>
+  </insert>
+  <insert id="insertSelective" parameterType="com.weichuang.ecommerce.barcode.entity.SalesShareEnvelopeWithdrawDetail" >
+    insert into t_sales_share_envelop_withdraw_detail
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="withdrawId != null" >
+        withdraw_id,
+      </if>
+      <if test="getEnvelopId != null" >
+        get_envelop_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="withdrawId != null" >
+        #{withdrawId,jdbcType=INTEGER},
+      </if>
+      <if test="getEnvelopId != null" >
+        #{getEnvelopId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.weichuang.ecommerce.barcode.entity.SalesShareEnvelopeWithdrawDetail" >
+    update t_sales_share_envelop_withdraw_detail
+    <set >
+      <if test="withdrawId != null" >
+        withdraw_id = #{withdrawId,jdbcType=INTEGER},
+      </if>
+      <if test="getEnvelopId != null" >
+        get_envelop_id = #{getEnvelopId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.weichuang.ecommerce.barcode.entity.SalesShareEnvelopeWithdrawDetail" >
+    update t_sales_share_envelop_withdraw_detail
+    set withdraw_id = #{withdrawId,jdbcType=INTEGER},
+      get_envelop_id = #{getEnvelopId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 销售人员 -->
+<mapper namespace="sqlmap.withdraw.orgi.SalesIncomeMapper">
+    <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.withdraw.entity.response.BonusTemplate">
+        <result column="sales_id" property="saleId" jdbcType="INTEGER"/>
+        <result column="income" property="everyMoney" jdbcType="DECIMAL"/>
+        <result column="day" property="day" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 根据业务人员的id查询某一时间段内每天的预计的可提成的汇总返回结果 -->
+    <resultMap type="com.weichuang.ecommerce.withdraw.entity.SalesDailyIncomeSumEntity" id="SalesDailyIncomeSumResultMap">
+        <result column="sales_id" property="salesId" jdbcType="INTEGER"/>
+        <result column="sales_name" property="salesName" jdbcType="VARCHAR"/>
+        <result column="receive_money" property="receiveMoney" jdbcType="DECIMAL"/>
+        <result column="income" property="income" jdbcType="DECIMAL"/>
+        <result column="create_day" property="createDay" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!-- 根据业务人员的id查询某一时间段内每天收入详情 -->
+    <resultMap type="com.weichuang.ecommerce.withdraw.entity.SalesDailyIncomeDetailEntity" id="SalesDailyIncomeDetailResultMap">
+        <result column="sales_id" property="salesId" jdbcType="INTEGER"/>
+        <result column="sales_name" property="salesName" jdbcType="VARCHAR"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="user_nickName" property="userNickName" jdbcType="VARCHAR"/>
+        <result column="receive_money" property="receiveMoney" jdbcType="DECIMAL"/>
+        <result column="income" property="income" jdbcType="DECIMAL"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+        <result column="agent_name" property="agentName" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!-- 根据代理商主键查询分红(一天总计以及可提现) -->
+    <select id="selectBySaleId" parameterType="Map" resultMap="BaseResultMap">
+     select sales_id,DATE_FORMAT(create_time,'%Y-%m-%d') as day,sum(income)as income from t_sales_income where sales_id=#{saleId}  and withdraw =0 and deleted=0 GROUP BY day
+   </select>
+   <!-- 根据代理主键查询总收益 -->
+    <select id="selectSumBySaleId" parameterType="Map" resultMap="BaseResultMap">
+     select sales_id,DATE_FORMAT(create_time,'%Y-%m-%d') as day,sum(income)as income from t_sales_income where sales_id=#{saleId}   and deleted=0 GROUP BY day
+   </select>
+    <!-- 根据代理商id和系统时间批量更新待提现或者已提现状态 -->
+    <update id="updateCashStatus" parameterType="Map">
+        update t_sales_income
+        <set>
+            <if test="systemTime != null">withdraw_time= #{systemTime},</if>
+            <if test="status != null and status >0 ">withdraw = #{status}</if>
+        </set>
+        where sales_id=#{saleId} AND withdraw =0 <![CDATA[ AND create_time <= #{oldTime}]]>
+    </update>
+    
+    <!-- 根据代理商id和系统时间批量更新已提现状态 -->
+    <update id="updateCashStatusSuccess" parameterType="Map">
+        update t_sales_income
+        <set>
+            <if test="systemTime != null">withdraw_time= #{systemTime},</if>
+            <if test="status != null and status >0 ">withdraw = #{status}</if>
+        </set>
+        where sales_id=#{saleId} AND withdraw=1 <![CDATA[ AND withdraw_time <= #{oldTime}]]>
+    </update>
+    <!-- 根据代理商id和系统时间查询可提现的金额,用于和前台传过来的金额进行二次比较 -->
+    <select id="cashMoney" parameterType="Map" resultMap="BaseResultMap">
+     select sales_id,sum(income)as income from t_sales_income where sales_id=#{saleId} and withdraw =0 and deleted=0 <![CDATA[ AND create_time <= #{systemTime}]]>
+    </select>
+
+    <!-- 根据业务人员的id查询某一时间段内每天的预计的可提成的汇总 -->
+    <select id="getDailyIncomeSumBySalesId" parameterType="Map" resultMap="SalesDailyIncomeSumResultMap">
+        SELECT
+        sales_id,
+        sales_name,
+        SUM(receive_money) AS receive_money,
+        SUM(`income`) AS income,
+        DATE_FORMAT(create_time, '%Y-%m-%d') create_day
+        FROM
+        `t_sales_income`
+        WHERE sales_id=#{saleId}  AND deleted=0
+        <if test="startTime != null and startTime != ''"> AND create_time >= #{startTime}</if>
+        <if test="endTime != null  and endTime != ''"><![CDATA[ AND create_time <= #{endTime}]]></if>
+        GROUP BY create_day
+        ORDER BY create_day DESC
+    </select>
+
+    <!-- 根据业务人员的id查询某一时间段内每天的预计的可提成的汇总 -->
+    <select id="getDailyIncomeDetailBySalesId" parameterType="Map" resultMap="SalesDailyIncomeDetailResultMap">
+        SELECT
+        t_sales_income.sales_id,
+        t_sales_income.sales_name,
+        t_sales_income.order_no,
+        CAST(from_base64(t_user.nick_name) AS CHAR ) AS user_nickName,
+        t_sales_income.receive_money,
+        t_sales_income.income,
+        DATE_FORMAT(t_sales_income.create_time, '%T') create_time,
+        
+        r_user_agent_role.agent_name
+        FROM
+        t_sales_income LEFT JOIN t_order ON t_sales_income.order_no = t_order.order_no
+        LEFT JOIN t_user ON t_sales_income.user_id = t_user.id LEFT JOIN r_user_agent_role ON t_user.id=r_user_agent_role.user_id
+        WHERE t_sales_income.sales_id=#{saleId} AND deleted=0
+        <if test="startTime != null and startTime != ''"> AND t_sales_income.create_time >= #{startTime}</if>
+        <if test="endTime != null  and endTime != ''"><![CDATA[ AND t_sales_income.create_time <= #{endTime}]]></if>
+        ORDER BY t_sales_income.create_time DESC
+    </select>
+    
+    <!--订单退款后，逻辑删除业务人员收入-->
+    <update id="deleteSalesIncomeByOrderNo" parameterType="java.lang.String">
+        UPDATE `t_sales_income`
+        SET	`deleted` = 1
+        WHERE `order_no` = #{orderNo, jdbcType=VARCHAR}
+    </update>
+</mapper>

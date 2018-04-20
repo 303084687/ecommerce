@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.product.orgi.ProductClassifyMapper">
+  <!-- 列表数据返回map -->
+  <resultMap id="BaseResultMap" type="com.weichuang.ecommerce.product.entity.ProductClassifyEntity" >
+   <id column="id" property="id" jdbcType="INTEGER" />
+   <result column="title" property="title" jdbcType="VARCHAR"/>
+   <result column="image_url" property="imageUrl" jdbcType="VARCHAR"/>
+   <result column="sort" property="sort" jdbcType="INTEGER"/>
+   <result column="description" property="description" jdbcType="VARCHAR"/>
+   <result column="status" property="status" jdbcType="INTEGER"/>
+   <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+  </resultMap>
+  
+  <!-- 商品类型管理列表显示 -->
+	  <select id="getProductClassifyList" resultMap="BaseResultMap">
+		   SELECT id,title,image_url,sort,status,description,create_time FROM t_product_classify ORDER BY sort DESC,id DESC
+	  </select>
+  
+  <!-- 查询出状态正常的列表-->
+	 <select id="getProductClassifyWebList" resultMap="BaseResultMap">
+	     SELECT id,title,image_url,sort,status FROM t_product_classify where status=1 ORDER BY sort DESC,id DESC
+	 </select>
+  
+  <!-- 根据主键查询详情 -->
+	  <select id="getProductClassifyInfo" resultMap="BaseResultMap" parameterType="Map" >
+		  SELECT id,title,image_url,sort,status,description,create_time FROM t_product_classify WHERE id=#{classifyId}
+	  </select>
+  
+  <!-- 增加商品类型-->
+	  <insert id="addProductClassify" parameterType="com.weichuang.ecommerce.product.entity.ProductClassifyEntity">
+	      INSERT INTO t_product_classify (title,image_url,sort,status,description,create_time)
+	      VALUES (#{title,jdbcType=VARCHAR},#{imageUrl,jdbcType=VARCHAR},1,#{status,jdbcType=INTEGER},#{description,jdbcType=VARCHAR},now())
+	  </insert>
+  
+  <!-- 根据主键修改商品类型 -->
+	  <update id="updateProductClassify" parameterType="com.weichuang.ecommerce.product.entity.ProductClassifyEntity" >
+		    UPDATE t_product_classify
+		    <set>
+			    <if test="title != null and title !='' " >title = #{title,jdbcType=VARCHAR},</if>
+			    <if test="imageUrl != null and imageUrl !='' " > image_url= #{imageUrl,jdbcType=VARCHAR},</if>
+		        <if test="status != null and status >0" >status = #{status,jdbcType=INTEGER},</if>
+		        <if test="description != null and description !=''" >description = #{description,jdbcType=VARCHAR},</if>
+		    </set>
+		     WHERE id = #{id,jdbcType=INTEGER}
+	  </update>
+      
+  <!-- 置顶功能 -->
+	  <update id="updateHotById" parameterType="Map">
+		   UPDATE t_product_classify SET sort=#{maxSort}+1 WHERE id = #{classifyId,jdbcType=INTEGER} 
+      </update>
+      
+  <!-- 查询出最大排序数 -->
+	  <select id="maxSort" resultType="int">
+		 <![CDATA[ SELECT max(sort) as sort FROM t_product_classify]]>
+	  </select>
+</mapper>
